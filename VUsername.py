@@ -92,7 +92,7 @@ class VUsernameMod(loader.Module):
     AVATAR_MAX_REDIRECTS=3
     HTTP_USER_AGENT="Mozilla/5.0 (VUsername/1.1)"
     MAX_RETRIES_FRAGMENT=3
-    UPDATE_URL="https://raw.githubusercontent.com/lcetaa/VUsername-hikka-bot/refs/heads/main/vusername.py"
+    UPDATE_URL="https://raw.githubusercontent.com/lcetaa/VUsername-hikka-bot/refs/heads/main/VUsername.py"
     UPDATE_LOCK_WAIT=15
     UPDATE_INSTALL_TIMEOUT=60
     MAX_RETRIES_GEMINI=3

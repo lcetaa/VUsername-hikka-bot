@@ -4,6 +4,9 @@
 #  https://opensource.org/licenses/MIT
 
 # Name: VUsername
+# meta banner: https://raw.githubusercontent.com/lcetaa/VUsername-hikka-bot/refs/heads/main/meta_banner.png
+# meta pic: https://raw.githubusercontent.com/lcetaa/VUsername-hikka-bot/refs/heads/main/meta_pic.png
+# meta tags: usernames, fragment, telegram, ai, username_checker, automation
 # meta developer: @lceta
 
 __version__ = (2, 0, 1)
@@ -27,6 +30,17 @@ def emoji(name:str,glyph:str=None)->str:
     """Возвращает premium-эмодзи тег по имени из EMOJI_IDS."""
     eid,default_glyph=EMOJI_IDS[name]
     return f"<tg-emoji emoji-id='{eid}'>{glyph or default_glyph}</tg-emoji>"
+
+_TG_EMOJI_RE=re.compile(r"<tg-emoji[^>]*>(.*?)</tg-emoji>",re.DOTALL)
+
+def plain_emoji(text):
+    """Убирает тег <tg-emoji>, оставляя обычный юникод-эмодзи.
+    Нужно для inline-сообщений бота (self.inline.form/call.edit/call.answer) —
+    Bot API не поддерживает кастомные premium-эмодзи в этом теге, из-за чего
+    он показывается как сырой текст. В обычных сообщениях через аккаунт
+    (utils.answer) тег работает штатно и его трогать не нужно."""
+    if not text or"<tg-emoji"not in text:return text
+    return _TG_EMOJI_RE.sub(r"\1",text)
 
 class UsernameStatus(Enum):
     AVAILABLE="available";UNAVAILABLE="unavailable";INVALID="invalid"
@@ -87,7 +101,7 @@ class VUsernameMod(loader.Module):
     _KEY_QUERY_PATTERN=re.compile(r'([?&]key=)[^&\s]+',re.IGNORECASE)
 
     def __init__(self):
-        self.config=loader.ModuleConfig(loader.ConfigValue("channel_title","Этот юзернейм зарезервирован.","Channel title",validator=loader.validators.String()),loader.ConfigValue("channel_about","","Channel description",validator=loader.validators.String()),loader.ConfigValue("channel_avatar_url","https://raw.githubusercontent.com/neistv/mods/main/assets/other/rezerv.png","Avatar URL",validator=loader.validators.String()),loader.ConfigValue("channel_message","","Post-grab channel message",validator=loader.validators.String()),loader.ConfigValue("delay_min",1.2,".vfind minimum delay, sec",validator=loader.validators.Float(minimum=0.0)),loader.ConfigValue("delay_max",2.0,".vfind maximum delay, sec",validator=loader.validators.Float(minimum=0.0)),loader.ConfigValue("ai_provider","auto","AI provider (.vai)",validator=loader.validators.Choice(["auto","gemini","groq"])),loader.ConfigValue("ai_api_keys","","Gemini API keys, comma-separated",validator=loader.validators.Hidden()),loader.ConfigValue("ai_model","gemini-3.5-flash","Gemini model",validator=loader.validators.String()),loader.ConfigValue("groq_api_keys","","Groq API keys, comma-separated",validator=loader.validators.Hidden()),loader.ConfigValue("groq_model","openai/gpt-oss-120b","Groq model",validator=loader.validators.String()),)
+        self.config=loader.ModuleConfig(loader.ConfigValue("channel_title","This username is reserved.","Channel title",validator=loader.validators.String()),loader.ConfigValue("channel_about","Made by {me}","Channel description",validator=loader.validators.String()),loader.ConfigValue("channel_avatar_url","https://raw.githubusercontent.com/lcetaa/VUsername-hikka-bot/refs/heads/main/rezerv.png","Avatar URL",validator=loader.validators.String()),loader.ConfigValue("channel_message","<b>Interested in this username? Contact {me}</b>","Post-grab channel message",validator=loader.validators.String()),loader.ConfigValue("delay_min",1.2,".vfind minimum delay, sec",validator=loader.validators.Float(minimum=0.0)),loader.ConfigValue("delay_max",2.0,".vfind maximum delay, sec",validator=loader.validators.Float(minimum=0.0)),loader.ConfigValue("ai_provider","auto","AI provider (.vai)",validator=loader.validators.Choice(["auto","gemini","groq"])),loader.ConfigValue("ai_api_keys","","Gemini API keys, comma-separated",validator=loader.validators.Hidden()),loader.ConfigValue("ai_model","gemini-3.5-flash","Gemini model",validator=loader.validators.String()),loader.ConfigValue("groq_api_keys","","Groq API keys, comma-separated",validator=loader.validators.Hidden()),loader.ConfigValue("groq_model","openai/gpt-oss-120b","Groq model",validator=loader.validators.String()),)
         self._find_running=False
         self._find_stop_event=None
         self._grab_lock=None
@@ -796,7 +810,21 @@ class VUsernameMod(loader.Module):
         channel=None
         title=str(self.config["channel_title"]or"")
         about=str(self.config["channel_about"]or"")
+        if"{me}"in about:
+            own_username=None
+            try:
+                me=await self._client.get_me()
+                own_username=getattr(me,"username",None)
+            except Exception:logger.debug("Не удалось получить собственный юзернейм для описания канала")
+            about=about.replace("{me}",f"@{own_username}"if own_username else"")
         channel_message=str(self.config["channel_message"]or"").strip()or None
+        if channel_message and"{me}"in channel_message:
+            own_username_msg=None
+            try:
+                me_msg=await self._client.get_me()
+                own_username_msg=getattr(me_msg,"username",None)
+            except Exception:logger.debug("Не удалось получить собственный юзернейм для сообщения канала")
+            channel_message=channel_message.replace("{me}",f"@{own_username_msg}"if own_username_msg else"")
         if not title.strip():return GrabStatus.BAD_TITLE,None,False
         try:
             result=await self._client(functions.channels.CreateChannelRequest(title=title,about=about,broadcast=True,megagroup=False))
@@ -825,7 +853,7 @@ class VUsernameMod(loader.Module):
         firstpost_ok=True
         if channel_message is not None:
             try:
-                await self._client.send_message(channel,channel_message)
+                await self._client.send_message(channel,channel_message,parse_mode="html")
             except Exception:
                 firstpost_ok=False
                 logger.exception("Не удалось отправить первый пост в канал @%s",username)
@@ -1146,7 +1174,7 @@ class VUsernameMod(loader.Module):
 
     async def _show_unavailable_result(self,message,username,telegram_status,allow_grab=False,flood_wait=None):
         safe_username=html.escape(username,quote=True)
-        loading=await self.inline.form(text=self.strings["checking"].format(username=safe_username),message=message,reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]])
+        loading=await self.inline.form(text=plain_emoji(self.strings["checking"].format(username=safe_username)),message=message,reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]])
         inline_loading=bool(loading)
         if not loading:loading=await utils.answer(message,self.strings["checking"].format(username=safe_username))
         fragment_status,price=await self._check_fragment(username)
@@ -1185,7 +1213,7 @@ class VUsernameMod(loader.Module):
             result_markup.append([{"text":self.strings["close_button"],"callback":self._close_cb}])
         if inline_loading:
             try:
-                await loading.edit(text=text,reply_markup=result_markup)
+                await loading.edit(text=plain_emoji(text),reply_markup=result_markup)
                 return
             except Exception as e:logger.warning("Не удалось обновить inline-результат: %s",e)
         await self._edit_status(loading,message,text)
@@ -1199,7 +1227,7 @@ class VUsernameMod(loader.Module):
         status,wait=await self._check(username)
         safe_username=html.escape(username,quote=True)
         if status is UsernameStatus.AVAILABLE:
-            form=await self.inline.form(text=self.strings["available"].format(username=safe_username),message=message,reply_markup=[[{"text":self.strings["grab_button"],"callback":self._grab_cb,"args":(username,)},{"text":"✖","callback":self._close_cb}]])
+            form=await self.inline.form(text=plain_emoji(self.strings["available"].format(username=safe_username)),message=message,reply_markup=[[{"text":self.strings["grab_button"],"callback":self._grab_cb,"args":(username,)},{"text":"✖","callback":self._close_cb}]])
             if not form:await utils.answer(message,self.strings["available_no_inline"].format(username=safe_username))
             return
         if status is UsernameStatus.FLOOD_WAIT:
@@ -1257,7 +1285,7 @@ class VUsernameMod(loader.Module):
     async def _update_find_status(self,status_message,message,text,inline_status):
         if inline_status and status_message is not None:
             try:
-                await status_message.edit(text=text,reply_markup=self._find_stop_markup())
+                await status_message.edit(text=plain_emoji(text),reply_markup=self._find_stop_markup())
                 return status_message
             except Exception as e:logger.warning("Не удалось обновить inline-прогресс поиска: %s",e);return status_message
         return await self._edit_status(status_message,message,text)
@@ -1265,7 +1293,7 @@ class VUsernameMod(loader.Module):
     async def _finish_find_text(self,status_message,message,text,inline_status):
         if inline_status and status_message is not None:
             try:
-                await status_message.edit(text=text,reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]])
+                await status_message.edit(text=plain_emoji(text),reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]])
                 return
             except Exception:logger.exception("Не удалось обновить финальное inline-состояние поиска")
         await self._edit_status(status_message,message,text)
@@ -1276,10 +1304,10 @@ class VUsernameMod(loader.Module):
         page_text,page_buttons=self._build_find_page(found_tuple,0,mode_text)
         if inline_status and status_message is not None:
             try:
-                await status_message.edit(text=page_text,reply_markup=page_buttons)
+                await status_message.edit(text=plain_emoji(page_text),reply_markup=page_buttons)
                 return
             except Exception:logger.exception("Не удалось превратить прогресс поиска в результаты")
-        form=await self.inline.form(text=page_text,message=message,reply_markup=page_buttons)
+        form=await self.inline.form(text=plain_emoji(page_text),message=message,reply_markup=page_buttons)
         if form:
             if status_message is not None and not inline_status:
                 try:await status_message.delete()
@@ -1292,11 +1320,11 @@ class VUsernameMod(loader.Module):
 
     async def _find_stop_cb(self,call):
         if not self._find_running or self._find_stop_event is None:
-            try:await call.answer(self.strings["stop_idle_alert"],show_alert=False)
+            try:await call.answer(plain_emoji(self.strings["stop_idle_alert"]),show_alert=False)
             except Exception as e:logger.debug("Не удалось ответить на неактуальную кнопку стоп: %s",e)
             return
         self._find_stop_event.set()
-        try:await call.answer(self.strings["find_stopping"],show_alert=False)
+        try:await call.answer(plain_emoji(self.strings["find_stopping"]),show_alert=False)
         except Exception as e:logger.debug("Не удалось подтвердить остановку поиска: %s",e)
 
     def _build_find_page(self,usernames,page,mode_text):
@@ -1322,11 +1350,11 @@ class VUsernameMod(loader.Module):
         try:await call.answer()
         except Exception as e:logger.debug("Не удалось подтвердить callback пагинации: %s",e)
         if not usernames:
-            try:await call.edit(text=self.strings["find_page_empty"],reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]])
+            try:await call.edit(text=plain_emoji(self.strings["find_page_empty"]),reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]])
             except Exception:logger.exception("Не удалось показать пустую страницу результатов")
             return
         text,buttons=self._build_find_page(tuple(usernames),int(page),mode_text)
-        try:await call.edit(text=text,reply_markup=buttons)
+        try:await call.edit(text=plain_emoji(text),reply_markup=buttons)
         except Exception:logger.exception("Не удалось переключить страницу результатов")
 
     @loader.command(ru_doc="[число] | [префикс] — поиск свободных юзернеймов.",en_doc="[number] | [prefix] — search for available usernames.")
@@ -1369,7 +1397,7 @@ class VUsernameMod(loader.Module):
         status_message=None;inline_status=False;found=[];found_count=0;checked=0;stop_reason=None;flood_wait=0;last_progress_update=time.monotonic()
         try:
             start_text=self.strings["find_start"].format(mode=mode_text,total=len(candidates))
-            status_message=await self.inline.form(text=start_text,message=message,reply_markup=self._find_stop_markup())
+            status_message=await self.inline.form(text=plain_emoji(start_text),message=message,reply_markup=self._find_stop_markup())
             inline_status=bool(status_message)
             if not status_message:status_message=await utils.answer(message,start_text)
             for index,username in enumerate(candidates):
@@ -1426,16 +1454,16 @@ class VUsernameMod(loader.Module):
     async def _grab_cb(self,call,username):
         username,error=self._validate_username(username)
         if error or username is None:
-            try:await call.answer(self.strings["grab_invalid"],show_alert=True)
+            try:await call.answer(plain_emoji(self.strings["grab_invalid"]),show_alert=True)
             except Exception as e:logger.debug("Не удалось ответить на устаревший callback: %s",e)
             return
         if self._grab_lock is None:self._grab_lock=asyncio.Lock()
         if self._grab_lock.locked():
-            try:await call.answer(self.strings["grab_busy"],show_alert=False)
+            try:await call.answer(plain_emoji(self.strings["grab_busy"]),show_alert=False)
             except Exception as e:logger.debug("Не удалось ответить на callback: %s",e)
             return
         async with self._grab_lock:
-            try:await call.answer(self.strings["grabbing"],show_alert=False)
+            try:await call.answer(plain_emoji(self.strings["grabbing"]),show_alert=False)
             except Exception as e:logger.debug("Не удалось показать статус callback: %s",e)
             status,info,rollback_failed=await self._grab_username(username)
             safe_username=html.escape(username,quote=True)
@@ -1444,7 +1472,7 @@ class VUsernameMod(loader.Module):
                 success_keys={GrabStatus.SUCCESS:"grab_success",GrabStatus.SUCCESS_AVATAR_FAILED:"grab_success_avatar_failed",GrabStatus.SUCCESS_FIRSTPOST_FAILED:"grab_success_firstpost_failed",GrabStatus.SUCCESS_AVATAR_FIRSTPOST_FAILED:"grab_success_avatar_firstpost_failed"}
                 text=self.strings[success_keys[status]].format(username=safe_username,channel=safe_channel)
             else:
-                error_text=html.escape(self._grab_error_text(status,info),quote=True)
+                error_text=html.escape(plain_emoji(self._grab_error_text(status,info)),quote=True)
                 rollback_warning=self.strings["rollback_warning"]if rollback_failed else""
                 text=self.strings["grab_error_title"].format(error=error_text,rollback_warning=rollback_warning)
             chat_id=None
@@ -1452,11 +1480,11 @@ class VUsernameMod(loader.Module):
             except Exception as e:logger.debug("Не удалось получить chat id из inline-формы: %s",e)
             if chat_id is None:
                 logger.error("Не удалось отправить отдельный результат захвата @%s: chat id отсутствует в inline unit",username)
-                try:await call.answer(self.strings["grab_error"],show_alert=True)
+                try:await call.answer(plain_emoji(self.strings["grab_error"]),show_alert=True)
                 except Exception as e:logger.debug("Не удалось показать fallback alert: %s",e)
                 return
             try:
-                result_form=await self.inline.form(text=text,message=chat_id,reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]],silent=True)
+                result_form=await self.inline.form(text=plain_emoji(text),message=chat_id,reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]],silent=True)
             except Exception:
                 logger.exception("Не удалось создать отдельную inline-форму результата @%s",username)
                 result_form=False
@@ -1556,11 +1584,11 @@ class VUsernameMod(loader.Module):
     async def _upd_force_cb(self,call):
         try:await call.answer()
         except Exception as e:logger.debug("Не удалось ответить на callback обновления: %s",e)
-        try:await call.edit(self.strings["upd_downloading"])
+        try:await call.edit(plain_emoji(self.strings["upd_downloading"]))
         except Exception as e:logger.debug("Не удалось обновить текст формы обновления: %s",e)
         ok=await self._safe_install_update()
         text=self.strings["upd_done"]if ok else self.strings["upd_fail"]
-        try:await call.edit(text)
+        try:await call.edit(plain_emoji(text))
         except Exception as e:logger.debug("Не удалось показать результат обновления: %s",e)
 
     async def _upd_cancel_cb(self,call):
@@ -1588,7 +1616,7 @@ class VUsernameMod(loader.Module):
                 return
             if not differs:
                 try:
-                    await self.inline.form(text=self.strings["upd_none_force"],message=message,reply_markup=[[{"text":self.strings["upd_force_btn"],"callback":self._upd_force_cb},{"text":self.strings["upd_cancel_btn"],"callback":self._upd_cancel_cb}]])
+                    await self.inline.form(text=plain_emoji(self.strings["upd_none_force"]),message=message,reply_markup=[[{"text":self.strings["upd_force_btn"],"callback":self._upd_force_cb},{"text":self.strings["upd_cancel_btn"],"callback":self._upd_cancel_cb}]])
                 except Exception:
                     await utils.answer(message,self.strings["upd_none"])
                 return

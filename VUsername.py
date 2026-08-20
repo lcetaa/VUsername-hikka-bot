@@ -7,6 +7,7 @@
 # meta banner: https://raw.githubusercontent.com/lcetaa/VUsername-hikka-bot/refs/heads/main/meta_banner.png
 # meta pic: https://raw.githubusercontent.com/lcetaa/VUsername-hikka-bot/refs/heads/main/meta_pic.png
 # meta tags: usernames, fragment, telegram, ai, username_checker, automation
+# meta help: @latexmods, @qhozek
 # meta developer: @lceta
 
 __version__ = (2, 0, 2)

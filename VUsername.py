@@ -9,7 +9,7 @@
 # meta tags: usernames, fragment, telegram, ai, username_checker, automation
 # meta developer: @lceta
 
-__version__ = (2, 0, 1)
+__version__ = (2, 0, 2)
 
 # ░█░░░█▀▀░█▀▀░▀█▀░█▀█
 # ░█░░░█░░░█▀▀░░█░░█▀█
@@ -24,21 +24,21 @@ from telethon.tl import functions
 from telethon.tl.types import InputChatUploadedPhoto
 from .. import loader,utils
 logger=logging.getLogger(__name__)
-EMOJI_IDS={"error":("5220197908342648622","❗️"),"boom":("5219901967916084166","💥"),"fragment":("5219943216781995020","⚡️"),"link":("5902449142575141204","🔗"),"clock":("5985616167740379273","⏰"),"coin":("6039802097916974085","🪙"),"robot":("5406683326750691396","🤖"),"money":("5893473283696759404","💰"),"card":("5902056028513505203","💳"),"star":("5208968969750330825","⭐"),"trophy":("6021644067111180663","🏆"),"success":("5287692511945437157","✅"),"cross":("5287611315588707430","❌"),"person":("5442879640379076105","👤"),"stop":("5287372146039861774","⛔"),"search":("5404439768979252377","🔍"),"sad":("5456343972010016640","😔"),"green":("5339135753316222622","🟢"),"lock":("5404552559115408271","🔒"),"chart":("5994378914636500516","📈"),"stats":("5895444149699612825","📊"),"tag":("6021594546138257831","🏷"),"fire":("5287404392654319394","🔥"),"warning":("6019102674832595118","⚠️"),"hourglass":("5402355073458123173","⏳"),}
+EMOJI_IDS={"error":("5220197908342648622","❗️"),"boom":("5219901967916084166","💥"),"fragment":("5219943216781995020","⚡️"),"link":("5902449142575141204","🔗"),"clock":("5985616167740379273","⏰"),"coin":("6039802097916974085","🪙"),"robot":("5406683326750691396","🤖"),"money":("5893473283696759404","💰"),"card":("5902056028513505203","💳"),"star":("5208968969750330825","⭐"),"trophy":("6021644067111180663","🏆"),"success":("5287692511945437157","✅"),"cross":("5287611315588707430","❌"),"person":("5442879640379076105","👤"),"stop":("5287372146039861774","⛔"),"search":("5404439768979252377","🔍"),"sad":("5456343972010016640","😔"),"green":("5339135753316222622","🟢"),"lock":("5404552559115408271","🔒"),"chart":("5994378914636500516","📈"),"stats":("5895444149699612825","📊"),"tag":("6021594546138257831","🏷"),"fire":("5287404392654319394","🔥"),"warning":("6019102674832595118","⚠️"),"hourglass":("5402355073458123173","⏳"),"comment":("5406876651818620703","💬")}
 
 def emoji(name:str,glyph:str=None)->str:
-    """Возвращает premium-эмодзи тег по имени из EMOJI_IDS."""
+    """Returns the premium emoji tag by name from EMOJI_IDS."""
     eid,default_glyph=EMOJI_IDS[name]
     return f"<tg-emoji emoji-id='{eid}'>{glyph or default_glyph}</tg-emoji>"
 
 _TG_EMOJI_RE=re.compile(r"<tg-emoji[^>]*>(.*?)</tg-emoji>",re.DOTALL)
 
 def plain_emoji(text):
-    """Убирает тег <tg-emoji>, оставляя обычный юникод-эмодзи.
-    Нужно для inline-сообщений бота (self.inline.form/call.edit/call.answer) —
-    Bot API не поддерживает кастомные premium-эмодзи в этом теге, из-за чего
-    он показывается как сырой текст. В обычных сообщениях через аккаунт
-    (utils.answer) тег работает штатно и его трогать не нужно."""
+    """Strips the <tg-emoji> tag, leaving a plain unicode emoji.
+    Needed for the bot's inline messages (self.inline.form/call.edit/call.answer) —
+    the Bot API does not support custom premium emoji in this tag, which makes
+    it render as raw text. In regular account messages (utils.answer) the tag
+    works fine and does not need to be touched."""
     if not text or"<tg-emoji"not in text:return text
     return _TG_EMOJI_RE.sub(r"\1",text)
 
@@ -59,8 +59,8 @@ class GrabStatus(Enum):
 @loader.tds
 class VUsernameMod(loader.Module):
     """Check usernames, AI valuation, and search for available ones via Fragment."""
-    strings={"name":"VUsername","no_args":"<b>{E_error} specify a username!!</b>","bad_length":"<b>{E_error} username must be 4 to 32 characters long!!</b>","bad_chars":"<b>{E_error} only latin letters, digits and _ are allowed in the username!!</b>","available":"username <b>@{username}</b> is available!!!\n\nwant to claim this username?","available_no_inline":"{E_boom} <b>@{username}</b> is available, but the inline form could not be created. Try the command again later.","grab_button":"✔ claim","close_button":"✖ close","checking":"<b>checking.. @{username}...</b>","fragment_sold":"{E_error} <b>@{username}</b> was sold on Fragment.\n\n{E_fragment} <b>found on Fragment:</b>\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","fragment_available":"{E_error} <b>@{username}</b> is taken.\n\n{E_fragment} <b>found on Fragment:</b>\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","fragment_unavailable":"{E_error} <b>@{username}</b> is taken or unavailable for assignment.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — not for sale.\n{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","price_line":"{E_coin} <b>price:</b> <code>{price}</code> GRAM\n","occupied":"{E_error} <b>@{username}</b> is taken or unavailable for assignment.","purchasable":"{E_coin} <b>@{username}</b> is only available as a collectible username.","fragment_error":"\n\n{E_error} <i>Fragment could not be checked temporarily.</i>","check_error":"{E_error} <b>Failed to check @{username} due to a Telegram error. Try again later.</b>","flood_wait_unknown":"{E_error} <b>@{username}</b> — <b>unknown</b>.","flood_wait_fragment_available":"{E_error} <b>@{username}</b> — <b>taken</b>.\n\n{E_fragment} <b>found on Fragment:</b>\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_sold":"{E_error} <b>@{username}</b> — <b>possibly taken</b>.\n\n{E_fragment} <b>Fragment:</b> username was sold.\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_unavailable":"{E_error} <b>@{username}</b> — <b>unknown</b>.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — not for sale.\n{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_note":"\n\n<b>{E_clock} FloodWait: {wait}.</b>\n<i>Because of the FloodWait it's impossible to know for sure whether the username is taken. But you can try to claim it by tapping the inline button below.</i>","prefix_bad":"<b>{E_error} prefix must contain only latin letters, digits and _ and be no longer than 31 characters.</b>","count_bad":"<b>{E_error} the check count must be a number from 1 to {maximum}.</b>","vfind_usage":"<b>{E_error} format: <code>.vfind</code>, <code>.vfind 100</code> or <code>.vfind user 100</code>.</b>","ai_evaluating":"<b>{E_robot} AI is analyzing @{username}...</b>","ai_result":"{body}","ai_no_key":"<b>{E_error} No API key set for AI evaluation.</b>\n\nGet key(s) at <code>aistudio.google.com</code> and set them via:\n<code>.config VUsername</code> → <code>ai_api_keys</code>\nYou can specify multiple keys separated by commas — this speeds things up and lowers the risk of hitting the quota.","ai_error_quota":"{E_error} Gemini API quota exceeded. Check your limits in the settings.","ai_error_quota_retry":"{E_error} Gemini API quota exceeded.\nTry again in about {seconds} sec.","ai_error_auth":"{E_error} <b>Invalid Gemini API key. Check your settings.</b>","ai_error_server":"{E_error} Temporary Gemini error. Try again later.","ai_error_model_not_found":"{E_error} Gemini model unavailable.\n\nCheck: <code>.config VUsername ai_model</code>\nRecommended: <code>gemini-3.5-flash</code>","ai_error_unknown":"{E_error} <b>AI error:</b> {error}","ai_note_available":"{E_green} <b>Available</b>, not on Fragment — claim: <code>.v {username}</code>\n","ai_note_taken_regular":"{E_lock} <b>The username is taken by a regular user, the estimate is theoretical.</b>\n","find_running":"<b>{E_hourglass} a search is already running, please wait...</b>","find_stop_button":"⛔ Stop","find_stopping":"Stopping the search...","find_start":"<b>{E_search} searching for available usernames {mode}...\nchecked: 0 / {total}</b>","find_progress":"<b>{E_search} searching {mode}...\nchecked: {checked} / {total}\n\nfound: {found_count}\n{preview}</b>","find_nothing":"<b>{E_sad} no available usernames found {mode}.\nTry a different prefix or run it again.</b>","find_stopped":"<b>{E_stop} search stopped.\nChecked: {checked} / {total}.\nFound: {found_count}.</b>","find_flood":"<b>{E_clock} search stopped due to a Telegram limit.\nChecked: {checked} / {total}.\nFloodWait: {wait}.</b>","find_error":"<b>{E_error} search stopped due to a Telegram error.\nChecked: {checked} / {total}. Try again later.</b>","find_preview_empty":"nothing yet...","find_result":"{E_boom} <b>found available usernames {mode}:</b>\n\n{lines}\n\n<i>Page {page}/{pages} · found: {total_found}</i>\n\ntap to claim:","find_result_fallback":"{E_boom} <b>found available usernames {mode}:</b>\n\n{lines}{more_line}","find_more":"\n\n<i>Showing the first {shown} of {total_found} found; inline pagination unavailable.</i>","find_page_empty":"The list of found usernames is no longer available.","stop_ok":"<b>{E_stop} search stopped.</b>","stop_idle":"<b>ℹ️ no search is running.</b>","stop_idle_alert":"ℹ️ No search is running.","grab_busy":"Another claim is already in progress, try again.","grabbing":"claiming...","grab_success":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}","grab_success_avatar_failed":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}\n\n<i>Failed to set the avatar; the username is already assigned to the channel.</i>","grab_success_firstpost_failed":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}\n\n<i>Failed to send the first post; the username is already assigned to the channel.</i>","grab_success_avatar_firstpost_failed":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}\n\n<i>The username is assigned, but the avatar and first post could not be set.</i>","grab_taken":"The username is already taken. It may have been claimed right after the check.","grab_invalid":"Telegram rejected this username as invalid.","grab_purchasable":"This username is only available as a collectible.","grab_flood":"{E_clock} Telegram limited the operation. Try again in {wait}.","grab_public_limit":"The account's limit of public channels/usernames has been reached.","grab_channel_limit":"The account's channel creation limit has been reached.","grab_restricted":"Telegram has restricted channel creation for this account.","grab_bad_title":"The channel title in settings is empty or invalid.","grab_bad_about":"The channel description in settings is too long or invalid.","grab_no_rights":"Telegram did not allow modifying the created channel.","grab_error":"Failed to claim the username due to a Telegram error. Details were written to the log.","rollback_warning":"\n\n<b>{E_warning} Failed to automatically delete the temporary channel after the error. Check your channel list manually.</b>","grab_error_title":"{E_error} <b>Error:</b>\n<code>{error}</code>{rollback_warning}","mode_prefix":"by prefix <b>@{prefix}</b>","mode_random":"random (<b>{length} characters</b>)","ai_pros_label":"Pros","ai_cons_label":"Cons","ai_figure_label":"Known figure","upd_checking":"{E_search} <b>checking for updates...</b>","upd_downloading":"{E_search} <b>updating VUsername...</b>","upd_done":"{E_success} <b>VUsername updated successfully!</b>","upd_none":"{E_success} <b>you already have the latest version.</b>","upd_none_force":"{E_success} <b>you already have the latest version. Update anyway?</b>","upd_force_btn":"↻ update anyway","upd_cancel_btn":"✖ cancel","upd_fail":"{E_error} <b>update failed. Check the logs.</b>","upd_fetch_fail":"{E_error} <b>could not reach the update source. Try again later.</b>","upd_busy":"{E_error} <b>an update check/install is already running in the background. Try again in a bit.</b>",}
-    strings_ru={"name":"VUsername","_cls_doc":"Проверка юзернеймов, ИИ-оценка и поиск свободных через Fragment.","no_args":"<b>{E_error} укажи юзак!!</b>","bad_length":"<b>{E_error} юзернейм должен содержать от 4 до 32 символов!!</b>","bad_chars":"<b>{E_error} в юзернейме допустимы только латинские буквы, цифры и _ !!</b>","available":"юзак <b>@{username}</b> — свободен!!!\n\nхочешь занять этот юзернейм?","available_no_inline":"{E_boom} <b>@{username}</b> — свободен, но inline-форму создать не удалось. Повтори команду позже.","grab_button":"✔ занять","close_button":"✖ закрыть","checking":"<b>проверяю.. @{username}...</b>","fragment_sold":"{E_error} <b>@{username}</b> — продан на Fragment.\n\n{E_fragment} <b>найден на Fragment:</b>\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","fragment_available":"{E_error} <b>@{username}</b> — занят.\n\n{E_fragment} <b>найден на Fragment:</b>\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","fragment_unavailable":"{E_error} <b>@{username}</b> — занят или недоступен для назначения.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — не продаётся.\n{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","price_line":"{E_coin} <b>цена:</b> <code>{price}</code> GRAM\n","occupied":"{E_error} <b>@{username}</b> — занят или недоступен для назначения.","purchasable":"{E_coin} <b>@{username}</b> доступен только как коллекционный юзернейм.","fragment_error":"\n\n{E_error} <i>Fragment временно не удалось проверить.</i>","check_error":"{E_error} <b>Не удалось проверить @{username} из-за ошибки Telegram. Попробуй позже.</b>","flood_wait_unknown":"{E_error} <b>@{username}</b> — <b>неизвестно</b>.","flood_wait_fragment_available":"{E_error} <b>@{username}</b> — <b>занят</b>.\n\n{E_fragment} <b>найден на Fragment:</b>\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_sold":"{E_error} <b>@{username}</b> — <b>Возможно, занят</b>.\n\n{E_fragment} <b>Fragment:</b> юзернейм продан.\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_unavailable":"{E_error} <b>@{username}</b> — <b>неизвестно</b>.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — не продаётся.\n{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_note":"\n\n<b>{E_clock} FloodWait: {wait}.</b>\n<i>Из-за FloodWait точно проверить, занят ли юзернейм, невозможно. Но вы можете попробовать занять его, нажав на inline-кнопку ниже.</i>","prefix_bad":"<b>{E_error} префикс должен содержать только латинские буквы, цифры и _ и быть не длиннее 31 символа.</b>","count_bad":"<b>{E_error} количество проверок должно быть числом от 1 до {maximum}.</b>","vfind_usage":"<b>{E_error} формат: <code>.vfind</code>, <code>.vfind 100</code> или <code>.vfind user 100</code>.</b>","ai_evaluating":"<b>{E_robot} ИИ анализирует @{username}...</b>","ai_result":"{body}","ai_no_key":"<b>{E_error} Не задан API-ключ для ИИ-оценки.</b>\n\nПолучи ключ(и) на <code>aistudio.google.com</code> и укажи их командой:\n<code>.config VUsername</code> → <code>ai_api_keys</code>\nМожно указать несколько ключей через запятую — это ускоряет работу и снижает риск упереться в квоту.","ai_error_quota":"{E_error} Превышена квота Gemini API. Проверьте лимиты в настройках.","ai_error_quota_retry":"{E_error} Превышена квота Gemini API.\nПовторите запрос примерно через {seconds} сек.","ai_error_auth":"{E_error} <b>Неверный API-ключ Gemini. Проверьте настройки.</b>","ai_error_server":"{E_error} Временная ошибка Gemini. Попробуйте позже.","ai_error_model_not_found":"{E_error} Модель Gemini недоступна.\n\nПроверьте: <code>.config VUsername ai_model</code>\nРекомендуется: <code>gemini-3.5-flash</code>","ai_error_unknown":"{E_error} <b>Ошибка ИИ:</b> {error}","ai_note_available":"{E_green} <b>Свободен</b>, не продаётся на Fragment — занять: <code>.v {username}</code>\n","ai_note_taken_regular":"{E_lock} <b>Юзернейм занят обычным пользователем, оценка теоретическая.</b>\n","find_running":"<b>{E_hourglass} уже идёт поиск, подожди...</b>","find_stop_button":"⛔ Стоп","find_stopping":"Останавливаю поиск...","find_start":"<b>{E_search} ищу свободные юзернеймы {mode}...\nпроверено: 0 / {total}</b>","find_progress":"<b>{E_search} ищу {mode}...\nпроверено: {checked} / {total}\n\nнайдено: {found_count}\n{preview}</b>","find_nothing":"<b>{E_sad} свободных юзернеймов {mode} не найдено.\nПопробуй другой префикс или запусти снова.</b>","find_stopped":"<b>{E_stop} поиск остановлен.\nПроверено: {checked} / {total}.\nНайдено: {found_count}.</b>","find_flood":"<b>{E_clock} поиск остановлен из-за ограничения Telegram.\nПроверено: {checked} / {total}.\nFloodWait: {wait}.</b>","find_error":"<b>{E_error} поиск остановлен из-за ошибки Telegram.\nПроверено: {checked} / {total}. Попробуй позже.</b>","find_preview_empty":"пока ничего...","find_result":"{E_boom} <b>найдены свободные юзернеймы {mode}:</b>\n\n{lines}\n\n<i>Страница {page}/{pages} · найдено: {total_found}</i>\n\nнажми чтобы занять:","find_result_fallback":"{E_boom} <b>найдены свободные юзернеймы {mode}:</b>\n\n{lines}{more_line}","find_more":"\n\n<i>Показаны первые {shown} из {total_found} найденных; inline-пагинация недоступна.</i>","find_page_empty":"Список найденных юзернеймов уже недоступен.","stop_ok":"<b>{E_stop} поиск остановлен.</b>","stop_idle":"<b>ℹ️ поиск не запущен.</b>","stop_idle_alert":"ℹ️ Поиск не запущен.","grab_busy":"Уже выполняется другой захват, попробуй ещё раз.","grabbing":"захватываю...","grab_success":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}","grab_success_avatar_failed":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}\n\n<i>Аватар установить не удалось; юзернейм уже закреплён за каналом.</i>","grab_success_firstpost_failed":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}\n\n<i>Первый пост отправить не удалось; юзернейм уже закреплён за каналом.</i>","grab_success_avatar_firstpost_failed":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}\n\n<i>Юзернейм закреплён, но аватар установить и первый пост отправить не удалось.</i>","grab_taken":"Юзернейм уже занят. Возможно, его успели забрать после проверки.","grab_invalid":"Telegram отклонил этот юзернейм как недопустимый.","grab_purchasable":"Этот юзернейм доступен только как коллекционный.","grab_flood":"{E_clock} Telegram ограничил операцию. Повтори через {wait}.","grab_public_limit":"Достигнут лимит публичных каналов/юзернеймов аккаунта.","grab_channel_limit":"Достигнут лимит создаваемых каналов аккаунта.","grab_restricted":"Telegram ограничил создание каналов для этого аккаунта.","grab_bad_title":"Название канала в настройках пустое или недопустимое.","grab_bad_about":"Описание канала в настройках слишком длинное или недопустимое.","grab_no_rights":"Telegram не разрешил изменить созданный канал.","grab_error":"Не удалось занять юзернейм из-за ошибки Telegram. Подробности записаны в лог.","rollback_warning":"\n\n<b>{E_warning} Не удалось автоматически удалить временный канал после ошибки. Проверь список своих каналов вручную.</b>","grab_error_title":"{E_error} <b>Ошибка:</b>\n<code>{error}</code>{rollback_warning}","mode_prefix":"по префиксу <b>@{prefix}</b>","mode_random":"случайные (<b>{length} символов</b>)","ai_pros_label":"Преимущества","ai_cons_label":"Недостатки","ai_figure_label":"Известная личность","upd_checking":"{E_search} <b>проверяю обновления...</b>","upd_downloading":"{E_search} <b>обновляю VUsername...</b>","upd_done":"{E_success} <b>VUsername успешно обновлён!</b>","upd_none":"{E_success} <b>у тебя уже последняя версия.</b>","upd_none_force":"{E_success} <b>у тебя уже последняя версия. Обновить всё равно?</b>","upd_force_btn":"↻ обновить всё равно","upd_cancel_btn":"✖ отмена","upd_fail":"{E_error} <b>обновление не удалось. Смотри логи.</b>","upd_fetch_fail":"{E_error} <b>не удалось достучаться до источника обновления. Попробуй позже.</b>","upd_busy":"{E_error} <b>проверка/установка обновления уже выполняется в фоне. Попробуй чуть позже.</b>",}
+    strings={"name":"VUsername","no_args":"<b>{E_error} specify a username!!</b>","bad_length":"<b>{E_error} username must be 4 to 32 characters long!!</b>","bad_chars":"<b>{E_error} only latin letters, digits and _ are allowed in the username!!</b>","available":"username <b>@{username}</b> is available!!!\n\nwant to claim this username?","available_no_inline":"{E_boom} <b>@{username}</b> is available, but the inline form could not be created. Try the command again later.","grab_button":"✔ claim","close_button":"✖ close","checking":"<b>checking.. @{username}...</b>","fragment_sold":"{E_error} <b>@{username}</b> was sold on Fragment.\n\n{E_fragment} <b>found on Fragment:</b>\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","fragment_available":"{E_error} <b>@{username}</b> is taken.\n\n{E_fragment} <b>found on Fragment:</b>\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","fragment_unavailable":"{E_error} <b>@{username}</b> is taken or unavailable for assignment.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — not for sale.\n{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","price_line":"{E_coin} <b>price:</b> <code>{price}</code> GRAM\n","occupied":"{E_error} <b>@{username}</b> is taken or unavailable for assignment.","purchasable":"{E_coin} <b>@{username}</b> is only available as a collectible username.","fragment_error":"\n\n{E_error} <i>Fragment could not be checked temporarily.</i>","check_error":"{E_error} <b>Failed to check @{username} due to a Telegram error. Try again later.</b>","flood_wait_unknown":"{E_error} <b>@{username}</b> — <b>unknown</b>.","flood_wait_fragment_available":"{E_error} <b>@{username}</b> — <b>taken</b>.\n\n{E_fragment} <b>found on Fragment:</b>\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_sold":"{E_error} <b>@{username}</b> — <b>possibly taken</b>.\n\n{E_fragment} <b>Fragment:</b> username was sold.\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_unavailable":"{E_error} <b>@{username}</b> — <b>unknown</b>.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — not for sale.\n{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_note":"\n\n<b>{E_clock} FloodWait: {wait}.</b>\n<i>Because of the FloodWait it's impossible to know for sure whether the username is taken. But you can try to claim it by tapping the inline button below.</i>","prefix_bad":"<b>{E_error} prefix must contain only latin letters, digits and _ and be no longer than 31 characters.</b>","count_bad":"<b>{E_error} the check count must be a number from 1 to {maximum}.</b>","vfind_usage":"<b>{E_error} format: <code>.vfind</code>, <code>.vfind 100</code> or <code>.vfind user 100</code>.</b>","ai_evaluating":"<b>{E_robot} AI is analyzing @{username}...</b>","ai_result":"{body}","ai_no_key":"<b>{E_error} No API key set for AI evaluation.</b>\n\nGet key(s) at <code>aistudio.google.com</code> and set them via:\n<code>.config VUsername</code> → <code>ai_api_keys</code>\nYou can specify multiple keys separated by commas — this speeds things up and lowers the risk of hitting the quota.","ai_error_quota":"{E_error} {provider} API quota exceeded. Check your limits in the settings.","ai_error_quota_retry":"{E_error} {provider} API quota exceeded.\nTry again in about {seconds} sec.","ai_error_auth":"{E_error} <b>Invalid {provider} API key. Check your settings.</b>","ai_error_server":"{E_error} Temporary {provider} error. Try again later.","ai_error_model_not_found":"{E_error} Gemini model unavailable.\n\nCheck: <code>.config VUsername ai_model</code>\nRecommended: <code>gemini-3.5-flash</code>","ai_error_unknown":"{E_error} <b>{provider} error:</b> {error}","ai_error_both":"{E_error} <b>AI unavailable: both providers failed.</b>\n\n<b>Gemini:</b> {gemini_error}\n<b>Groq:</b> {groq_error}","ai_err_quota":"quota exceeded","ai_err_auth":"invalid API key","ai_err_server":"temporary server error","ai_err_network":"network error","ai_err_json":"invalid response format","ai_err_no_key":"no API key set","ai_err_model_not_found":"model unavailable","ai_err_unknown":"unknown error","ai_note_available":"{E_green} <b>Available</b>, not on Fragment — claim: <code>.v {username}</code>\n","ai_note_taken_regular":"{E_lock} <b>The username is taken by a regular user, the estimate is theoretical.</b>\n","ai_comment_label":"Comments","find_running":"<b>{E_hourglass} a search is already running, please wait...</b>","find_stop_button":"⛔ Stop","find_stopping":"Stopping the search...","find_start":"<b>{E_search} searching for available usernames {mode}...\nchecked: 0 / {total}</b>","find_progress":"<b>{E_search} searching {mode}...\nchecked: {checked} / {total}\n\nfound: {found_count}\n{preview}</b>","find_nothing":"<b>{E_sad} no available usernames found {mode}.\nTry a different prefix or run it again.</b>","find_stopped":"<b>{E_stop} search stopped.\nChecked: {checked} / {total}.\nFound: {found_count}.</b>","find_flood":"<b>{E_clock} search stopped due to a Telegram limit.\nChecked: {checked} / {total}.\nFloodWait: {wait}.</b>","find_error":"<b>{E_error} search stopped due to a Telegram error.\nChecked: {checked} / {total}. Try again later.</b>","find_preview_empty":"nothing yet...","find_result":"{E_boom} <b>found available usernames {mode}:</b>\n\n{lines}\n\n<i>Page {page}/{pages} · found: {total_found}</i>\n\ntap to claim:","find_result_fallback":"{E_boom} <b>found available usernames {mode}:</b>\n\n{lines}{more_line}","find_more":"\n\n<i>Showing the first {shown} of {total_found} found; inline pagination unavailable.</i>","find_page_empty":"The list of found usernames is no longer available.","stop_ok":"<b>{E_stop} search stopped.</b>","stop_idle":"<b>ℹ️ no search is running.</b>","stop_idle_alert":"ℹ️ No search is running.","grab_busy":"Another claim is already in progress, try again.","grabbing":"claiming...","grab_success":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}","grab_success_avatar_failed":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}\n\n<i>Failed to set the avatar; the username is already assigned to the channel.</i>","grab_success_firstpost_failed":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}\n\n<i>Failed to send the first post; the username is already assigned to the channel.</i>","grab_success_avatar_firstpost_failed":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}\n\n<i>The username is assigned, but the avatar and first post could not be set.</i>","grab_taken":"The username is already taken. It may have been claimed right after the check.","grab_invalid":"Telegram rejected this username as invalid.","grab_purchasable":"This username is only available as a collectible.","grab_flood":"{E_clock} Telegram limited the operation. Try again in {wait}.","grab_public_limit":"The account's limit of public channels/usernames has been reached.","grab_channel_limit":"The account's channel creation limit has been reached.","grab_restricted":"Telegram has restricted channel creation for this account.","grab_bad_title":"The channel title in settings is empty or invalid.","grab_bad_about":"The channel description in settings is too long or invalid.","grab_no_rights":"Telegram did not allow modifying the created channel.","grab_error":"Failed to claim the username due to a Telegram error. Details were written to the log.","rollback_warning":"\n\n<b>{E_warning} Failed to automatically delete the temporary channel after the error. Check your channel list manually.</b>","grab_error_title":"{E_error} <b>Error:</b>\n<code>{error}</code>{rollback_warning}","mode_prefix":"by prefix <b>@{prefix}</b>","mode_random":"random (<b>{length} characters</b>)","ai_pros_label":"Pros","ai_cons_label":"Cons","ai_figure_label":"Known figure","upd_checking":"{E_search} <b>checking for updates...</b>","upd_downloading":"{E_search} <b>updating VUsername...</b>","upd_done":"{E_success} <b>VUsername updated successfully!</b>","upd_none":"{E_success} <b>you already have the latest version.</b>","upd_none_force":"{E_success} <b>you already have the latest version. Update anyway?</b>","upd_force_btn":"↻ update anyway","upd_cancel_btn":"✖ cancel","upd_fail":"{E_error} <b>update failed. Check the logs.</b>","upd_fetch_fail":"{E_error} <b>could not reach the update source. Try again later.</b>","upd_busy":"{E_error} <b>an update check/install is already running in the background. Try again in a bit.</b>",}
+    strings_ru={"name":"VUsername","_cls_doc":"Проверка юзернеймов, ИИ-оценка и поиск свободных через Fragment.","no_args":"<b>{E_error} укажи юзак!!</b>","bad_length":"<b>{E_error} юзернейм должен содержать от 4 до 32 символов!!</b>","bad_chars":"<b>{E_error} в юзернейме допустимы только латинские буквы, цифры и _ !!</b>","available":"юзак <b>@{username}</b> — свободен!!!\n\nхочешь занять этот юзернейм?","available_no_inline":"{E_boom} <b>@{username}</b> — свободен, но inline-форму создать не удалось. Повтори команду позже.","grab_button":"✔ занять","close_button":"✖ закрыть","checking":"<b>проверяю.. @{username}...</b>","fragment_sold":"{E_error} <b>@{username}</b> — продан на Fragment.\n\n{E_fragment} <b>найден на Fragment:</b>\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","fragment_available":"{E_error} <b>@{username}</b> — занят.\n\n{E_fragment} <b>найден на Fragment:</b>\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","fragment_unavailable":"{E_error} <b>@{username}</b> — занят или недоступен для назначения.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — не продаётся.\n{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","price_line":"{E_coin} <b>цена:</b> <code>{price}</code> GRAM\n","occupied":"{E_error} <b>@{username}</b> — занят или недоступен для назначения.","purchasable":"{E_coin} <b>@{username}</b> доступен только как коллекционный юзернейм.","fragment_error":"\n\n{E_error} <i>Fragment временно не удалось проверить.</i>","check_error":"{E_error} <b>Не удалось проверить @{username} из-за ошибки Telegram. Попробуй позже.</b>","flood_wait_unknown":"{E_error} <b>@{username}</b> — <b>неизвестно</b>.","flood_wait_fragment_available":"{E_error} <b>@{username}</b> — <b>занят</b>.\n\n{E_fragment} <b>найден на Fragment:</b>\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_sold":"{E_error} <b>@{username}</b> — <b>Возможно, занят</b>.\n\n{E_fragment} <b>Fragment:</b> юзернейм продан.\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_unavailable":"{E_error} <b>@{username}</b> — <b>неизвестно</b>.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — не продаётся.\n{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_note":"\n\n<b>{E_clock} FloodWait: {wait}.</b>\n<i>Из-за FloodWait точно проверить, занят ли юзернейм, невозможно. Но вы можете попробовать занять его, нажав на inline-кнопку ниже.</i>","prefix_bad":"<b>{E_error} префикс должен содержать только латинские буквы, цифры и _ и быть не длиннее 31 символа.</b>","count_bad":"<b>{E_error} количество проверок должно быть числом от 1 до {maximum}.</b>","vfind_usage":"<b>{E_error} формат: <code>.vfind</code>, <code>.vfind 100</code> или <code>.vfind user 100</code>.</b>","ai_evaluating":"<b>{E_robot} ИИ анализирует @{username}...</b>","ai_result":"{body}","ai_no_key":"<b>{E_error} Не задан API-ключ для ИИ-оценки.</b>\n\nПолучи ключ(и) на <code>aistudio.google.com</code> и укажи их командой:\n<code>.config VUsername</code> → <code>ai_api_keys</code>\nМожно указать несколько ключей через запятую — это ускоряет работу и снижает риск упереться в квоту.","ai_error_quota":"{E_error} Превышена квота {provider} API. Проверьте лимиты в настройках.","ai_error_quota_retry":"{E_error} Превышена квота {provider} API.\nПовторите запрос примерно через {seconds} сек.","ai_error_auth":"{E_error} <b>Неверный API-ключ {provider}. Проверьте настройки.</b>","ai_error_server":"{E_error} Временная ошибка {provider}. Попробуйте позже.","ai_error_model_not_found":"{E_error} Модель Gemini недоступна.\n\nПроверьте: <code>.config VUsername ai_model</code>\nРекомендуется: <code>gemini-3.5-flash</code>","ai_error_unknown":"{E_error} <b>Ошибка {provider}:</b> {error}","ai_error_both":"{E_error} <b>ИИ недоступен: оба провайдера не сработали.</b>\n\n<b>Gemini:</b> {gemini_error}\n<b>Groq:</b> {groq_error}","ai_err_quota":"превышена квота","ai_err_auth":"неверный API-ключ","ai_err_server":"временная ошибка сервера","ai_err_network":"ошибка сети","ai_err_json":"некорректный формат ответа","ai_err_no_key":"не задан API-ключ","ai_err_model_not_found":"модель недоступна","ai_err_unknown":"неизвестная ошибка","ai_note_available":"{E_green} <b>Свободен</b>, не продаётся на Fragment — занять: <code>.v {username}</code>\n","ai_note_taken_regular":"{E_lock} <b>Юзернейм занят обычным пользователем, оценка теоретическая.</b>\n","ai_comment_label":"Комментарии","find_running":"<b>{E_hourglass} уже идёт поиск, подожди...</b>","find_stop_button":"⛔ Стоп","find_stopping":"Останавливаю поиск...","find_start":"<b>{E_search} ищу свободные юзернеймы {mode}...\nпроверено: 0 / {total}</b>","find_progress":"<b>{E_search} ищу {mode}...\nпроверено: {checked} / {total}\n\nнайдено: {found_count}\n{preview}</b>","find_nothing":"<b>{E_sad} свободных юзернеймов {mode} не найдено.\nПопробуй другой префикс или запусти снова.</b>","find_stopped":"<b>{E_stop} поиск остановлен.\nПроверено: {checked} / {total}.\nНайдено: {found_count}.</b>","find_flood":"<b>{E_clock} поиск остановлен из-за ограничения Telegram.\nПроверено: {checked} / {total}.\nFloodWait: {wait}.</b>","find_error":"<b>{E_error} поиск остановлен из-за ошибки Telegram.\nПроверено: {checked} / {total}. Попробуй позже.</b>","find_preview_empty":"пока ничего...","find_result":"{E_boom} <b>найдены свободные юзернеймы {mode}:</b>\n\n{lines}\n\n<i>Страница {page}/{pages} · найдено: {total_found}</i>\n\nнажми чтобы занять:","find_result_fallback":"{E_boom} <b>найдены свободные юзернеймы {mode}:</b>\n\n{lines}{more_line}","find_more":"\n\n<i>Показаны первые {shown} из {total_found} найденных; inline-пагинация недоступна.</i>","find_page_empty":"Список найденных юзернеймов уже недоступен.","stop_ok":"<b>{E_stop} поиск остановлен.</b>","stop_idle":"<b>ℹ️ поиск не запущен.</b>","stop_idle_alert":"ℹ️ Поиск не запущен.","grab_busy":"Уже выполняется другой захват, попробуй ещё раз.","grabbing":"захватываю...","grab_success":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}","grab_success_avatar_failed":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}\n\n<i>Аватар установить не удалось; юзернейм уже закреплён за каналом.</i>","grab_success_firstpost_failed":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}\n\n<i>Первый пост отправить не удалось; юзернейм уже закреплён за каналом.</i>","grab_success_avatar_firstpost_failed":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}\n\n<i>Юзернейм закреплён, но аватар установить и первый пост отправить не удалось.</i>","grab_taken":"Юзернейм уже занят. Возможно, его успели забрать после проверки.","grab_invalid":"Telegram отклонил этот юзернейм как недопустимый.","grab_purchasable":"Этот юзернейм доступен только как коллекционный.","grab_flood":"{E_clock} Telegram ограничил операцию. Повтори через {wait}.","grab_public_limit":"Достигнут лимит публичных каналов/юзернеймов аккаунта.","grab_channel_limit":"Достигнут лимит создаваемых каналов аккаунта.","grab_restricted":"Telegram ограничил создание каналов для этого аккаунта.","grab_bad_title":"Название канала в настройках пустое или недопустимое.","grab_bad_about":"Описание канала в настройках слишком длинное или недопустимое.","grab_no_rights":"Telegram не разрешил изменить созданный канал.","grab_error":"Не удалось занять юзернейм из-за ошибки Telegram. Подробности записаны в лог.","rollback_warning":"\n\n<b>{E_warning} Не удалось автоматически удалить временный канал после ошибки. Проверь список своих каналов вручную.</b>","grab_error_title":"{E_error} <b>Ошибка:</b>\n<code>{error}</code>{rollback_warning}","mode_prefix":"по префиксу <b>@{prefix}</b>","mode_random":"случайные (<b>{length} символов</b>)","ai_pros_label":"Преимущества","ai_cons_label":"Недостатки","ai_figure_label":"Известная личность","upd_checking":"{E_search} <b>проверяю обновления...</b>","upd_downloading":"{E_search} <b>обновляю VUsername...</b>","upd_done":"{E_success} <b>VUsername успешно обновлён!</b>","upd_none":"{E_success} <b>у тебя уже последняя версия.</b>","upd_none_force":"{E_success} <b>у тебя уже последняя версия. Обновить всё равно?</b>","upd_force_btn":"↻ обновить всё равно","upd_cancel_btn":"✖ отмена","upd_fail":"{E_error} <b>обновление не удалось. Смотри логи.</b>","upd_fetch_fail":"{E_error} <b>не удалось достучаться до источника обновления. Попробуй позже.</b>","upd_busy":"{E_error} <b>проверка/установка обновления уже выполняется в фоне. Попробуй чуть позже.</b>",}
     for _dict in(strings,strings_ru):
         for _key,_val in list(_dict.items()):
             if isinstance(_val,str)and"{E_"in _val:
@@ -84,8 +84,11 @@ class VUsernameMod(loader.Module):
     FRAGMENT_TIMEOUT=(5,10)
     FRAGMENT_CACHE_TTL=90.0
     FRAGMENT_CACHE_MAX_ENTRIES=500
+    SIMILAR_CACHE_TTL=300.0
+    SIMILAR_CACHE_MAX_ENTRIES=300
+    SIMILAR_LISTINGS_LIMIT=10
     AI_TIMEOUT=(5,40)
-    AI_CACHE_TTL=900.0
+    AI_CACHE_TTL=90.0
     TON_USD_RATE=1.322
     AVATAR_TIMEOUT=(5,10)
     AVATAR_MAX_BYTES=10*1024*1024
@@ -108,6 +111,8 @@ class VUsernameMod(loader.Module):
         self._ai_cache={}
         self._fragment_cache={}
         self._fragment_cache_lock=asyncio.Lock()
+        self._similar_cache={}
+        self._similar_cache_lock=asyncio.Lock()
         self._own_usernames=None
         self.api_keys=[]
         self.key_status={}
@@ -175,19 +180,30 @@ class VUsernameMod(loader.Module):
             logger.warning("Request to %s failed after %d retries: %s",url,max_retries,self._redact(str(last_error)))
         return 500,None
 
+    @staticmethod
+    def _parse_amount(text):
+        match=re.search(r"(?<![A-Za-z0-9_])(\d[\d\s,.]*)(?![A-Za-z0-9_])",text)
+        if not match:return None
+        raw=match.group(1).strip().rstrip(".,").replace(" ","").replace(",","")
+        try:
+            num=float(raw)
+        except ValueError:
+            return None
+        return num if num>0 else None
+
     async def _check_fragment_async(self,username:str):
         url=f"https://fragment.com/username/{username}"
         status_code,content=await self._request_with_retry(url,max_retries=self.MAX_RETRIES_FRAGMENT)
-        if status_code==404:return FragmentStatus.NOT_FOUND,None
+        if status_code==404:return FragmentStatus.NOT_FOUND,None,[]
         if status_code!=200 or content is None:
             logger.warning("Fragment HTTP %s for @%s",status_code,username)
-            return FragmentStatus.ERROR,None
-        if isinstance(content,dict):return FragmentStatus.ERROR,None
+            return FragmentStatus.ERROR,None,[]
+        if isinstance(content,dict):return FragmentStatus.ERROR,None,[]
         try:
             soup=BeautifulSoup(content,"html.parser")
         except Exception:
             logger.exception("Failed to parse Fragment HTML for @%s",username)
-            return FragmentStatus.ERROR,None
+            return FragmentStatus.ERROR,None,[]
 
         def normalize_text(v):return" ".join(v.split()).strip().lower()
 
@@ -211,16 +227,81 @@ class VUsernameMod(loader.Module):
                     if match:
                         price=match.group(1).strip().rstrip(".,")
                         if price:
-                            logger.info("Fragment[@%s]: цена=%r",username,price)
+                            logger.info("Fragment[@%s]: price=%r",username,price)
                             return price
             return None
+
+        parse_amount=self._parse_amount
+
+        def extract_offers():
+            """Collects the bid/offer history from the 'Latest Offers' block on the username's
+            page — these are real amounts people offered for this specific username in
+            the past, even if the deal did not go through. Fragment renders this block's
+            rows as div/tr-like 'rows' (like the site's other listings), not always as a
+            classic <table>, so we search for both markup variants."""
+            offers=[]
+            heading_re=re.compile(r"latest offers|последние предлож",re.IGNORECASE)
+            scope=None
+            for heading in soup.find_all(["h1","h2","h3","h4","div","span"]):
+                heading_text=heading.get_text(" ",strip=True)
+                if heading_text and len(heading_text)<80 and heading_re.search(heading_text):
+                    scope=heading.find_parent(["section","div"])or heading.parent or heading
+                    break
+
+            def rows_from(node):
+                found=[]
+                rows=node.select("tr, .tm-row-selectable, .tm-table-row, .table-row, .tm-row")
+                for row in rows:
+                    cells=row.find_all(["td","th"])or row.select(".table-cell, .tm-cell, .tm-grid-cell")
+                    if cells:
+                        first_text=" ".join(cells[0].get_text(" ",strip=True).split())
+                    else:
+                        first_text=" ".join(row.get_text(" ",strip=True).split())
+                    if not first_text:continue
+                    amount=parse_amount(first_text)
+                    if amount is not None:found.append(amount)
+                return found
+
+            def values_from(node):
+                found=[]
+                for sel in("div.table-cell-value.tm-value.icon-before.icon-ton",".tm-value.icon-ton",".tm-value.icon-before"):
+                    for el in node.select(sel):
+                        value=" ".join(el.get_text(" ",strip=True).split())
+                        if not value or"@"in value:continue
+                        amount=parse_amount(value)
+                        if amount is not None:found.append(amount)
+                    if found:break
+                return found
+
+            if scope is not None:
+                offers=rows_from(scope)
+                if not offers:offers=values_from(scope)
+            if not offers:
+                table=None
+                for candidate in soup.find_all("table"):
+                    header_text=normalize_text(candidate.get_text(" ",strip=True)[:200])
+                    if"offer"in header_text or"предлож"in header_text:
+                        table=candidate;break
+                if table is not None:
+                    rows=table.select("tbody tr")or table.find_all("tr")
+                    for row in rows:
+                        cells=row.find_all(["td","th"])
+                        if not cells:continue
+                        amount=parse_amount(" ".join(cells[0].get_text(" ",strip=True).split()))
+                        if amount is not None:offers.append(amount)
+            if not offers:
+                offers=values_from(soup)
+            if offers:logger.info("Fragment[@%s]: offers found=%d, values=%s",username,len(offers),offers[:10])
+            return offers[:50]
+
         for node in soup.select(".tm-section-header-status"):
             badge_text=node.get_text(" ",strip=True)
             status=classify_visible_status(badge_text)
             if status is not None:
                 price=extract_price()if status in(FragmentStatus.SOLD,FragmentStatus.AVAILABLE)else None
-                logger.info("Fragment[@%s]: статус-бейдж %r -> %s",username,badge_text,status)
-                return status,price
+                offers=extract_offers()if status not in(FragmentStatus.SOLD,FragmentStatus.AVAILABLE)else[]
+                logger.info("Fragment[@%s]: status badge %r -> %s",username,badge_text,status)
+                return status,price,offers
         username_lower=username.lower()
         result_selectors=("tr",".tm-row-selectable",".tm-table-row",".tm-search-result",".table-row",".tm-row")
         seen_nodes=set()
@@ -236,10 +317,11 @@ class VUsernameMod(loader.Module):
                 status=classify_visible_status(text)
                 if status is not None:
                     price=extract_price()if status in(FragmentStatus.SOLD,FragmentStatus.AVAILABLE)else None
-                    logger.info("Fragment[@%s]: строка поиска %r -> %s",username,text,status)
-                    return status,price
-        logger.info("Fragment[@%s]: статус не распознан",username)
-        return FragmentStatus.NOT_FOUND,None
+                    offers=extract_offers()if status not in(FragmentStatus.SOLD,FragmentStatus.AVAILABLE)else[]
+                    logger.info("Fragment[@%s]: search row %r -> %s",username,text,status)
+                    return status,price,offers
+        logger.info("Fragment[@%s]: status not recognized",username)
+        return FragmentStatus.NOT_FOUND,None,[]
 
     async def _check_fragment(self,username):
         key=username.lower()
@@ -247,22 +329,107 @@ class VUsernameMod(loader.Module):
         async with self._fragment_cache_lock:
             cached=self._fragment_cache.get(key)
             if cached and now-cached[0]<self.FRAGMENT_CACHE_TTL:
-                return cached[1],cached[2]
-        status,price=await self._check_fragment_async(username)
+                return cached[1],cached[2],cached[3]
+        status,price,offers=await self._check_fragment_async(username)
         async with self._fragment_cache_lock:
-            self._fragment_cache[key]=(now,status,price)
+            self._fragment_cache[key]=(now,status,price,offers)
             if len(self._fragment_cache)>self.FRAGMENT_CACHE_MAX_ENTRIES:
-                expired=[k for k,(ts,_,_)in self._fragment_cache.items()if now-ts>=self.FRAGMENT_CACHE_TTL]
+                expired=[k for k,(ts,_,_,_)in self._fragment_cache.items()if now-ts>=self.FRAGMENT_CACHE_TTL]
                 for k in expired:self._fragment_cache.pop(k,None)
-        return status,price
+        return status,price,offers
 
-    def _build_ai_prompt(self,username,fragment_status,price):
+    async def _fetch_similar_listings_async(self,username:str):
+        """Looks up similar usernames on Fragment via the search page (fragment.com/?query=...) —
+        e.g. for 'hacker' that's hacker2, hacker3, hackerd, etc. — along with their status
+        (available/taken) and price. These are real market reference points for usernames
+        of a similar structure/theme, which help the AI calibrate the price more precisely
+        when there is no direct sale data for the requested username itself."""
+        url=f"https://fragment.com/?query={username}"
+        status_code,content=await self._request_with_retry(url,max_retries=self.MAX_RETRIES_FRAGMENT)
+        if status_code!=200 or content is None or isinstance(content,dict):
+            return[]
+        try:
+            soup=BeautifulSoup(content,"html.parser")
+        except Exception:
+            logger.exception("Failed to parse Fragment search HTML for @%s",username)
+            return[]
+        username_lower=username.lower()
+        name_re=re.compile(r"@([A-Za-z0-9_]{4,32})")
+        results=[]
+        seen={username_lower}
+        for row in soup.select("tr, .tm-row-selectable, .tm-table-row, .table-row, .tm-row"):
+            row_text=" ".join(row.get_text(" ",strip=True).split())
+            if not row_text:continue
+            match=name_re.search(row_text)
+            if not match:continue
+            candidate=match.group(1)
+            candidate_lower=candidate.lower()
+            if candidate_lower in seen:continue
+            lowered=row_text.lower()
+            if"taken"in lowered:
+                status_label="taken"
+            elif"available"in lowered or"minimum bid"in lowered or"for sale"in lowered:
+                status_label="available"
+            else:
+                continue
+            seen.add(candidate_lower)
+            price=None
+            if status_label=="available":
+                for sel in("div.table-cell-value.tm-value.icon-before.icon-ton",".tm-value.icon-ton",".tm-value.icon-before"):
+                    el=row.select_one(sel)
+                    if el:
+                        value=" ".join(el.get_text(" ",strip=True).split())
+                        price=self._parse_amount(value)
+                        if price is not None:break
+                if price is None:
+                    price=self._parse_amount(row_text)
+            results.append((candidate,status_label,price))
+            if len(results)>=self.SIMILAR_LISTINGS_LIMIT*2:break
+        if results:logger.info("Fragment search[@%s]: similar listings found=%d",username,len(results))
+        return results[:self.SIMILAR_LISTINGS_LIMIT*2]
+
+    async def _fetch_similar_listings(self,username):
+        key=username.lower()
+        now=time.monotonic()
+        async with self._similar_cache_lock:
+            cached=self._similar_cache.get(key)
+            if cached and now-cached[0]<self.SIMILAR_CACHE_TTL:
+                return cached[1]
+        listings=await self._fetch_similar_listings_async(username)
+        async with self._similar_cache_lock:
+            self._similar_cache[key]=(now,listings)
+            if len(self._similar_cache)>self.SIMILAR_CACHE_MAX_ENTRIES:
+                expired=[k for k,(ts,_)in self._similar_cache.items()if now-ts>=self.SIMILAR_CACHE_TTL]
+                for k in expired:self._similar_cache.pop(k,None)
+        return listings
+
+    def _build_ai_prompt(self,username,fragment_status,price,offers=None,similar_listings=None):
         is_ru=self._is_ru()
         comparable_usd=None
+        offers_comparable_usd=None
         if is_ru:
             context_lines=[f"Юзернейм: @{username}",f"Длина: {len(username)} символов"]
         else:
             context_lines=[f"Username: @{username}",f"Length: {len(username)} characters"]
+        offers=[o for o in(offers or[])if isinstance(o,(int,float))and o>0]
+        if offers and not(fragment_status in(FragmentStatus.SOLD,FragmentStatus.AVAILABLE)and price):
+            sorted_offers=sorted(offers,reverse=True)
+            top_offers=sorted_offers[:8]
+            max_offer=sorted_offers[0]
+            offers_sorted_asc=sorted(offers)
+            n=len(offers_sorted_asc)
+            median_offer=offers_sorted_asc[n//2]if n%2 else(offers_sorted_asc[n//2-1]+offers_sorted_asc[n//2])/2
+            try:
+                max_offer_usd=round(max_offer*self.TON_USD_RATE)
+                median_offer_usd=round(median_offer*self.TON_USD_RATE)
+                offers_comparable_usd=(median_offer_usd,max_offer_usd)
+            except(TypeError,ValueError):
+                offers_comparable_usd=None
+            offers_str=", ".join(f"{v:,.0f}".replace(",","," )for v in top_offers)
+            if is_ru:
+                context_lines.append(f"История предложений (офферов) на Fragment за этот юзернейм, в GRAM (это НЕ принятые продавцом ставки, а реальные суммы, которые разные покупатели были готовы заплатить в разное время): {offers_str}. Медианный оффер ≈ {median_offer:,.0f} GRAM (~${median_offer_usd}), максимальный оффер ≈ {max_offer:,.0f} GRAM (~${max_offer_usd}). Это ПРЯМОЕ доказательство реального рыночного спроса на именно этот юзернейм — используй эту историю как ОСНОВНОЙ ориентир при оценке цены, а не только длину/качество слова. Поскольку это неподтверждённые (не принятые) офферы, а не факт продажи, разумный диапазон price_low_usd/price_high_usd должен обычно располагаться заметно НИЖЕ максимального оффера, но БЛИЗКО к медианному или выше него, если офферов много и они стабильно высокие — НЕ занижай оценку до нескольких десятков долларов, если история показывает многократные оффера в сотни и тысячи GRAM.")
+            else:
+                context_lines.append(f"History of offers (bids) on Fragment for this exact username, in GRAM (these are NOT offers accepted by the seller, but real amounts different buyers were willing to pay at various times): {offers_str}. Median offer ≈ {median_offer:,.0f} GRAM (~${median_offer_usd}), highest offer ≈ {max_offer:,.0f} GRAM (~${max_offer_usd}). This is DIRECT evidence of real market demand for this specific username — use this history as the PRIMARY anchor for your price estimate, not just word length/quality. Since these are unaccepted offers rather than a confirmed sale, a reasonable price_low_usd/price_high_usd range should usually sit noticeably BELOW the highest offer, but CLOSE to or above the median offer if there are many consistently high offers — do NOT lowball the estimate to a few tens of dollars when the history shows repeated offers in the hundreds or thousands of GRAM.")
         if fragment_status in(FragmentStatus.SOLD,FragmentStatus.AVAILABLE)and price:
             try:
                 gram_amount=float(re.sub(r"[^\d.]","",price.replace(",","")))
@@ -286,12 +453,28 @@ class VUsernameMod(loader.Module):
             context_lines.append("Не удалось проверить Fragment (техническая ошибка) — данных о цене нет, но продажа не исключена."if is_ru else"Could not check Fragment (technical error) — no price data, but a sale is not ruled out.")
         else:
             context_lines.append("Данных о цене на Fragment нет, продаж не найдено."if is_ru else"No Fragment price data, no sales found.")
-        logger.info("AI-промпт[@%s]: fragment_status=%s, price=%r",username,fragment_status,price)
+        similar_priced=[(u,p)for u,s,p in(similar_listings or[])if s=="available"and isinstance(p,(int,float))and p>0]
+        similar_taken_count=sum(1 for _,s,_ in(similar_listings or[])if s=="taken")
+        if similar_priced:
+            similar_priced=similar_priced[:8]
+            try:
+                avg_price=sum(p for _,p in similar_priced)/len(similar_priced)
+                avg_price_usd=round(avg_price*self.TON_USD_RATE)
+            except(TypeError,ValueError,ZeroDivisionError):
+                avg_price_usd=None
+            listings_str=", ".join(f"@{u} — {p:,.0f} GRAM".replace(",","," )for u,p in similar_priced)
+            if is_ru:
+                extra=f" Также занято (без цены, только для справки о конкуренции ниши): {similar_taken_count}."if similar_taken_count else""
+                context_lines.append(f"Похожие/смежные юзернеймы, найденные в поиске Fragment по этому нейму (реальные текущие минимальные ставки за похожие по структуре ники): {listings_str}."+(f" Средняя минимальная ставка среди них ≈ {avg_price_usd}$."if avg_price_usd else"")+extra+" Это ВСПОМОГАТЕЛЬНЫЙ ориентир по общему ценовому уровню ниши/паттерна нейма (например, вариации с цифрами или похожим корнем слова) — используй его как второстепенный сигнал ПОСЛЕ прямых данных о самом запрошенном юзернейме (факт продажи/офферы важнее), но он полезен, когда прямых данных нет или их мало.")
+            else:
+                extra=f" Also taken (no price, competition context only): {similar_taken_count}."if similar_taken_count else""
+                context_lines.append(f"Similar/related usernames found in Fragment search results for this name (real current minimum bids for similarly-structured handles): {listings_str}."+(f" Average minimum bid among them ≈ ${avg_price_usd}."if avg_price_usd else"")+extra+" Use this as a SECONDARY signal for the general price level of this niche/pattern (e.g. digit variations or a shared word root) — it ranks BELOW direct data about the requested username itself (an actual sale or offer history matters more), but it's useful when direct data is missing or sparse.")
+        logger.info("AI prompt[@%s]: fragment_status=%s, price=%r, similar=%d",username,fragment_status,price,len(similar_listings or[]))
         if is_ru:
-            prompt=("Ты — эксперт по оценке Telegram-юзернеймов на маркетплейсе Fragment. Оцени указанный юзернейм по критериям: длина, запоминаемость, является ли словом/брендом/аббревиатурой, читаемость, наличие цифр или подчёркиваний, потенциальный спрос среди коллекционеров. Если юзернейм ЯВНО совпадает с известной публичной персоной, брендом или проектом — укажи это в public_figure. Считай совпадением: 1) точное имя/ник; 2) leetspeak-варианты (замена букв на похожие цифры/символы: o→0, i→1, e→3 и т.п.); 3) случаи, когда узнаваемое имя/ник СОДЕРЖИТСЯ внутри юзернейма как подстрока, даже если до или после него есть дополнительные символы, буквы, цифры или подчёркивания (например, 'samsepi0l_ovf' содержит 'samsepiol' — узнаваемый ник Сэма Сепиола / Эллиота Алдерсона из сериала «Мистер Робот», даже с приставкой '_ovf' на конце — это ЗАСЧИТЫВАЕТСЯ как совпадение). Не отбрасывай совпадение только из-за лишних символов вокруг узнаваемой части — если ядро (сама узнаваемая часть) читается однозначно, указывай public_figure. НЕ считай совпадением случайные сокращения, натянутые ассоциации или аббревиатуры, которые можно трактовать десятками способов (например, 'dcequ' — это НЕ явное совпадение с DC Extended Universe, это просто короткая строка, потому что тут нет узнаваемой подстроки-имени). Если сомневаешься — оставляй public_figure null. ВАЖНО про цену: если в контексте указана фактическая цена продажи на Fragment — твой диапазон price_low_usd/price_high_usd должен быть БЛИЗКИМ к этой цене (примерно от 0.6x до 1.5x от неё), а не в разы выше. Если фактической цены нет — давай МАКСИМАЛЬНО СКРОМНЫЙ, консервативный диапазон, как для рядового непроданного юзернейма без подтверждённого спроса: по умолчанию склоняйся к нижней части реальных рыночных цен похожих ниш на Fragment, а не к верхней. Для юзернейма без public_figure, БЕЗ смысла (случайный набор букв, не слово и не аббревиатура) и без цифр — типичная адекватная цена не должна превышать 40$, но ОБЯЗАТЕЛЬНО варьируй конкретное число в зависимости от длины, произносимости и качества звучания конкретного юзернейма — НЕ возвращай один и тот же диапазон для разных юзернеймов, разные строки должны получать заметно разные оценки. БЕЗ фантастических завышений — не пиши сотни или тысячи долларов за обычный короткий нейм без подтверждённого спроса, даже если он короткий и без цифр. Лучше немного занизить, чем завысить. ЕСЛИ public_figure не null: НЕ указывай price_low_usd/price_high_usd для бренда/персоны самостоятельно — вместо этого заполни поле figure_scale одной из категорий: \"mega\" (глобальный супербренд/суперзвезда с сотнями миллионов-миллиардами пользователей/фанатов, например TikTok, Google, Apple, топовая мировая звезда), \"major\" (известный международный бренд/публичная персона, но менее масштабный, например средняя по размеру компания, известный в своей стране актёр/блогер), \"moderate\" (узнаваемый, но нишевый бренд/персонаж, известный ограниченной аудитории), \"minor\" (местный/малоизвестный бренд или персонаж, известность которого сомнительна). В этом случае price_low_usd и price_high_usd можно оставить null. В cons пиши пункт, только если недостаток реально есть; если явных недостатков нет — верни пустой массив [], НЕ пиши 'нету'/'отсутствуют'/подобные заглушки. То же для pros. Учти контекст ниже.\n\n"+"\n".join(context_lines)+"\n\nОтветь СТРОГО в виде JSON без пояснений вне JSON, формат:\n{\"price_low_usd\": число (грубая нижняя оценка в $, ОБЯЗАТЕЛЬНО заполни даже если не уверен — ориентируйся на длину/качество и типичные цены похожих юзернеймов (null допустим только если public_figure не null — тогда используется figure_scale вместо этого)), \"price_high_usd\": число (грубая верхняя оценка в $, те же правила), \"creation_cost_gram\": число (обычно 10 для 5+ символов, больше для коротких), \"creation_cost_usd\": число или null, \"rank\": целое число 0-10, \"pros\": [\"короткие пункты-преимущества, 3-6 слов, максимум 3 шт\"], \"cons\": [\"короткие пункты-недостатки, 3-6 слов, максимум 3 шт\"], \"public_figure\": \"имя персоны/бренда, если юзернейм явно на неё указывает, иначе null\", \"figure_note\": \"1 короткое предложение о персоне/бренде на русском БЕЗ повторения самого имени персоны/бренда в начале (имя уже выводится отдельно перед этим полем, начинай сразу с сути, например 'Глобальная платформа коротких видео.', а НЕ 'TikTok — глобальная платформа...'), если public_figure не null, иначе null\", \"figure_scale\": \"mega|major|moderate|minor, только если public_figure не null, иначе null\", \"has_meaning\": true/false (true — ТОЛЬКО если юзернейм ЦЕЛИКОМ читается как настоящее слово, реальное имя/ник, узнаваемый бренд или осмысленная аббревиатура, БЕЗ существенного 'мусора' вокруг — то есть лишние буквы/цифры не должны занимать значительную часть юзернейма и не должны ломать восприятие как единого осмысленного слова/имени. false — если юзернейм это набор случайных букв, произвольная комбинация с цифрами/приставками/суффиксами, даже если где-то внутри случайно угадывается часть известного слова/бренда (например 'sbajaj2892' — false, потому что цифры и лишняя 's' делают это бессмысленным набором символов, а не осмысленным ником, несмотря на то что внутри есть 'bajaj'). Будь строгим: при малейшем сомнении ставь false.)}")
+            prompt=("Ты — эксперт по оценке Telegram-юзернеймов на маркетплейсе Fragment. Оцени указанный юзернейм по критериям: длина, запоминаемость, является ли словом/брендом/аббревиатурой, читаемость, наличие цифр или подчёркиваний, потенциальный спрос среди коллекционеров. Если юзернейм ЯВНО совпадает с известной публичной персоной, брендом или проектом — укажи это в public_figure. Считай совпадением: 1) точное имя/ник; 2) leetspeak-варианты (замена букв на похожие цифры/символы: o→0, i→1, e→3 и т.п.); 3) случаи, когда узнаваемое имя/ник СОДЕРЖИТСЯ внутри юзернейма как подстрока, даже если до или после него есть дополнительные символы, буквы, цифры или подчёркивания (например, 'samsepi0l_ovf' содержит 'samsepiol' — узнаваемый ник Сэма Сепиола / Эллиота Алдерсона из сериала «Мистер Робот», даже с приставкой '_ovf' на конце — это ЗАСЧИТЫВАЕТСЯ как совпадение). Не отбрасывай совпадение только из-за лишних символов вокруг узнаваемой части — если ядро (сама узнаваемая часть) читается однозначно, указывай public_figure. НЕ считай совпадением случайные сокращения, натянутые ассоциации или аббревиатуры, которые можно трактовать десятками способов (например, 'dcequ' — это НЕ явное совпадение с DC Extended Universe, это просто короткая строка, потому что тут нет узнаваемой подстроки-имени). Если сомневаешься — оставляй public_figure null. ВАЖНО про цену: если в контексте указана фактическая цена продажи на Fragment — твой диапазон price_low_usd/price_high_usd должен быть БЛИЗКИМ к этой цене (примерно от 0.6x до 1.5x от неё), а не в разы выше. Если фактической цены нет — давай МАКСИМАЛЬНО СКРОМНЫЙ, консервативный диапазон, как для рядового непроданного юзернейма без подтверждённого спроса: по умолчанию склоняйся к нижней части реальных рыночных цен похожих ниш на Fragment, а не к верхней. Для юзернейма без public_figure, БЕЗ смысла (случайный набор букв, не слово и не аббревиатура) и без цифр — типичная адекватная цена не должна превышать 40$, но ОБЯЗАТЕЛЬНО варьируй конкретное число в зависимости от длины, произносимости и качества звучания конкретного юзернейма — НЕ возвращай один и тот же диапазон для разных юзернеймов, разные строки должны получать заметно разные оценки. БЕЗ фантастических завышений — не пиши сотни или тысячи долларов за обычный короткий нейм без подтверждённого спроса, даже если он короткий и без цифр. Лучше немного занизить, чем завысить. ЕСЛИ public_figure не null: НЕ указывай price_low_usd/price_high_usd для бренда/персоны самостоятельно — вместо этого заполни поле figure_scale одной из категорий: \"mega\" (глобальный супербренд/суперзвезда с сотнями миллионов-миллиардами пользователей/фанатов, например TikTok, Google, Apple, топовая мировая звезда), \"major\" (известный международный бренд/публичная персона, но менее масштабный, например средняя по размеру компания, известный в своей стране актёр/блогер), \"moderate\" (узнаваемый, но нишевый бренд/персонаж, известный ограниченной аудитории), \"minor\" (местный/малоизвестный бренд или персонаж, известность которого сомнительна). В этом случае price_low_usd и price_high_usd можно оставить null. В cons пиши пункт, только если недостаток реально есть; если явных недостатков нет — верни пустой массив [], НЕ пиши 'нету'/'отсутствуют'/подобные заглушки. Не пиши в cons пункт вида 'не является словом'/'бессмысленный набор символов', если внутри юзернейма есть обычная читаемая leetspeak-замена буквы цифрой (см. правило про has_meaning ниже) — в этом случае такой минус будет ошибочным. То же для pros. Учти контекст ниже.\n\n"+"\n".join(context_lines)+"\n\nОтветь СТРОГО в виде JSON без пояснений вне JSON, формат:\n{\"price_low_usd\": число (грубая нижняя оценка в $, ОБЯЗАТЕЛЬНО заполни даже если не уверен — ориентируйся на длину/качество и типичные цены похожих юзернеймов (null допустим только если public_figure не null — тогда используется figure_scale вместо этого)), \"price_high_usd\": число (грубая верхняя оценка в $, те же правила), \"creation_cost_gram\": число (обычно 10 для 5+ символов, больше для коротких), \"creation_cost_usd\": число или null, \"rank\": целое число 0-10, \"pros\": [\"короткие пункты-преимущества, 3-6 слов, максимум 3 шт\"], \"cons\": [\"короткие пункты-недостатки, 3-6 слов, максимум 3 шт\"], \"public_figure\": \"имя персоны/бренда, если юзернейм явно на неё указывает, иначе null\", \"figure_note\": \"1 короткое предложение о персоне/бренде на русском БЕЗ повторения самого имени персоны/бренда в начале (имя уже выводится отдельно перед этим полем, начинай сразу с сути, например 'Глобальная платформа коротких видео.', а НЕ 'TikTok — глобальная платформа...'), если public_figure не null, иначе null\", \"figure_scale\": \"mega|major|moderate|minor, только если public_figure не null, иначе null\", \"has_meaning\": true/false (true — если юзернейм ЦЕЛИКОМ читается как настоящее слово, реальное имя/ник, узнаваемый бренд или осмысленная аббревиатура, БЕЗ существенного 'мусора' вокруг — то есть лишние буквы/цифры не должны занимать значительную часть юзернейма и не должны ломать восприятие как единого осмысленного слова/имени. ВАЖНО про цифры внутри слова (leetspeak): если одна или несколько цифр стоят ВНУТРИ слова/имени на месте похожей по начертанию буквы (например 0→o/о, 1→i/l/л, 3→e/е, 4→a/ч, 6→b/б, 9→g/р и т.п.) и после мысленной подстановки буквы вместо цифры получается реальное, однозначно читаемое слово или чьё-то имя/ник (например 'Sy4enish' читается как 'Sychenish'/'Сученыш' с заменой 4→ч, 'pr1vet' — как 'privet') — это НЕ 'мусор', а обычный игровой приём написания, поэтому has_meaning=true, и такую цифру не нужно перечислять как недостаток 'не является словом'. Отличай это от случая, когда цифры добавлены СНАРУЖИ как приставка/суффикс/номер копии (например 'bajaj2892', 'hacker2') — там has_meaning оценивается по основному слову без цифр, а сами цифры-суффикс уместно указать как небольшой минус (выглядит как копия/номер аккаунта). false — если юзернейм это набор случайных букв, произвольная комбинация с цифрами/приставками/суффиксами, которая не читается как единое слово даже после разумной подстановки, даже если где-то внутри случайно угадывается часть известного слова/бренда (например 'sbajaj2892' — false, потому что цифры и лишняя 's' делают это бессмысленным набором символов, а не осмысленным ником, несмотря на то что внутри есть 'bajaj'). Будь строгим при явном мусоре, но не занижай оценку за обычную и читаемую leetspeak-замену буквы цифрой внутри слова.), \"comment\": \"краткое описание значения/ассоциации юзернейма (например, для 'apple' — 'крупная технологическая компания'), если юзернейм не имеет явного смысла, оставь null\"}")
         else:
-            prompt=("You are an expert in valuing Telegram usernames on the Fragment marketplace. Evaluate the given username by: length, memorability, whether it's a word/brand/abbreviation, readability, presence of digits or underscores, potential demand among collectors. If the username CLEARLY and UNAMBIGUOUSLY matches a known public figure, brand, or project (e.g. an exact name/handle of a person or an official brand abbreviation) — state it in public_figure. Do NOT count random abbreviations, far-fetched associations, or acronyms that could be read a dozen different ways (e.g. 'dcequ' is NOT a clear match for the DC Extended Universe, it's just a short string). If unsure, leave public_figure null. IMPORTANT about price: if the context states an actual Fragment sale price — your price_low_usd/price_high_usd range must be CLOSE to that price (roughly 0.6x to 1.5x of it), not several times higher. If there is no actual price — give a MAXIMALLY MODEST, conservative range, as for an ordinary unsold username with no confirmed demand: default toward the lower end of real market prices for similar niches on Fragment, not the upper end. For a username with no public_figure, NO clear meaning (random string of letters, not a word or abbreviation) and no digits — a fair price should not exceed 40$, but you MUST vary the exact number based on the specific username's length, pronounceability and sound quality — do NOT return the same range for different usernames, different strings should get noticeably different estimates. NO unrealistic inflation — don't write hundreds or thousands of dollars for an ordinary short name with no confirmed demand, even if it's short and has no digits. Better to slightly underestimate than overestimate. IF public_figure is not null: do NOT set price_low_usd/price_high_usd for the brand/person yourself — instead fill the figure_scale field with one of: \"mega\" (a global superbrand/superstar with hundreds of millions to billions of users/fans, e.g. TikTok, Google, Apple, a top-tier world-famous celebrity), \"major\" (a well-known international brand/public figure but smaller in scale, e.g. a mid-size company, an actor/creator famous within their own country), \"moderate\" (a recognizable but niche brand/character known to a limited audience), \"minor\" (a local or little-known brand/character whose fame is questionable). In this case price_low_usd and price_high_usd can be left null. Only include a cons item if the drawback genuinely exists; if there are no clear drawbacks, return an empty array [], do NOT write 'none'/'n/a'/similar placeholders. Same for pros. Take the context below into account.\n\n"+"\n".join(context_lines)+"\n\nRespond STRICTLY as JSON with no explanation outside the JSON, format:\n{\"price_low_usd\": number (rough low estimate in $, MUST be filled even if unsure — base it on length/quality and typical prices of similar usernames (null is only allowed if public_figure is not null — figure_scale is used instead in that case)), \"price_high_usd\": number (rough high estimate in $, same rules), \"creation_cost_gram\": number (usually 10 for 5+ characters, more for shorter ones), \"creation_cost_usd\": number or null, \"rank\": integer 0-10, \"pros\": [\"short bullet advantages, 3-6 words, max 3 items\"], \"cons\": [\"short bullet drawbacks, 3-6 words, max 3 items\"], \"public_figure\": \"name of the person/brand if the username clearly points to it, otherwise null\", \"figure_note\": \"1 short sentence about the person/brand WITHOUT repeating the person/brand name itself at the start (the name is already shown separately before this field — start directly with the description, e.g. 'Global short-video platform.', NOT 'TikTok — global short-video platform...'), if public_figure is not null, otherwise null\", \"figure_scale\": \"mega|major|moderate|minor, only if public_figure is not null, otherwise null\", \"has_meaning\": true/false (true ONLY if the username AS A WHOLE reads as a real word, an actual name/handle, a recognizable brand, or a meaningful abbreviation, WITHOUT substantial 'noise' around it — extra letters/digits must not make up a significant portion of the username or break the perception of it as a single meaningful word/name. false if the username is a random string of letters, an arbitrary combination with digits/prefixes/suffixes, even if part of a known word/brand can accidentally be spotted inside it (e.g. 'sbajaj2892' is false, because the digits and the extra 's' make it a meaningless jumble of characters rather than a meaningful handle, even though 'bajaj' appears inside it). Be strict: when in doubt, set false.)}")
-        return prompt,comparable_usd
+            prompt=("You are an expert in valuing Telegram usernames on the Fragment marketplace. Evaluate the given username by: length, memorability, whether it's a word/brand/abbreviation, readability, presence of digits or underscores, potential demand among collectors. If the username CLEARLY and UNAMBIGUOUSLY matches a known public figure, brand, or project (e.g. an exact name/handle of a person or an official brand abbreviation) — state it in public_figure. Do NOT count random abbreviations, far-fetched associations, or acronyms that could be read a dozen different ways (e.g. 'dcequ' is NOT a clear match for the DC Extended Universe, it's just a short string). If unsure, leave public_figure null. IMPORTANT about price: if the context states an actual Fragment sale price — your price_low_usd/price_high_usd range must be CLOSE to that price (roughly 0.6x to 1.5x of it), not several times higher. If there is no actual price — give a MAXIMALLY MODEST, conservative range, as for an ordinary unsold username with no confirmed demand: default toward the lower end of real market prices for similar niches on Fragment, not the upper end. For a username with no public_figure, NO clear meaning (random string of letters, not a word or abbreviation) and no digits — a fair price should not exceed 40$, but you MUST vary the exact number based on the specific username's length, pronounceability and sound quality — do NOT return the same range for different usernames, different strings should get noticeably different estimates. NO unrealistic inflation — don't write hundreds or thousands of dollars for an ordinary short name with no confirmed demand, even if it's short and has no digits. Better to slightly underestimate than overestimate. For has_meaning=true, do NOT force the price to $100 and do NOT treat $100 as a fixed value. Choose the price range yourself based on the username's actual meaning, rarity, memorability, commercial usefulness, and likely demand. Meaningful usernames may be worth well below $100, around $100, or substantially above $100 (up to $1000 in this module). Do not rely on a hardcoded list of example words; evaluate any meaningful word/name/abbreviation individually.  IF public_figure is not null: do NOT set price_low_usd/price_high_usd for the brand/person yourself — instead fill the figure_scale field with one of: \"mega\" (a global superbrand/superstar with hundreds of millions to billions of users/fans, e.g. TikTok, Google, Apple, a top-tier world-famous celebrity), \"major\" (a well-known international brand/public figure but smaller in scale, e.g. a mid-size company, an actor/creator famous within their own country), \"moderate\" (a recognizable but niche brand/character known to a limited audience), \"minor\" (a local or little-known brand/character whose fame is questionable). In this case price_low_usd and price_high_usd can be left null. Only include a cons item if the drawback genuinely exists; if there are no clear drawbacks, return an empty array [], do NOT write 'none'/'n/a'/similar placeholders. Do NOT add a cons item like 'not a real word'/'meaningless string' if the username contains an ordinary readable leetspeak digit-for-letter substitution (see the has_meaning rule below) — such a drawback would be incorrect in that case. Same for pros. Take the context below into account.\n\n"+"\n".join(context_lines)+"\n\nRespond STRICTLY as JSON with no explanation outside the JSON, format:\n{\"price_low_usd\": number (rough low estimate in $, MUST be filled even if unsure — base it on length/quality and typical prices of similar usernames (null is only allowed if public_figure is not null — figure_scale is used instead in that case)), \"price_high_usd\": number (rough high estimate in $, same rules), \"creation_cost_gram\": number (usually 10 for 5+ characters, more for shorter ones), \"creation_cost_usd\": number or null, \"rank\": integer 0-10, \"pros\": [\"short bullet advantages, 3-6 words, max 3 items\"], \"cons\": [\"short bullet drawbacks, 3-6 words, max 3 items\"], \"public_figure\": \"name of the person/brand if the username clearly points to it, otherwise null\", \"figure_note\": \"1 short sentence about the person/brand WITHOUT repeating the person/brand name itself at the start (the name is already shown separately before this field — start directly with the description, e.g. 'Global short-video platform.', NOT 'TikTok — global short-video platform...'), if public_figure is not null, otherwise null\", \"figure_scale\": \"mega|major|moderate|minor, only if public_figure is not null, otherwise null\", \"has_meaning\": true/false (true if the username AS A WHOLE reads as a real word, an actual name/handle, a recognizable brand, or a meaningful abbreviation, WITHOUT substantial 'noise' around it — extra letters/digits must not make up a significant portion of the username or break the perception of it as a single meaningful word/name. IMPORTANT about digits INSIDE a word (leetspeak): if one or more digits sit INSIDE the word/name in place of a visually similar letter (e.g. 0→o, 1→i/l, 3→e, 4→a, 6→b, 9→g, etc.) and mentally substituting the letter back yields a real, clearly readable word or a person's name/handle (e.g. 'pr1vet' reads as 'privet', 'Sy4enish' reads as a name with 4→ch) — this is NOT 'noise', it's an ordinary stylized spelling, so set has_meaning=true, and do not list that digit as a 'not a real word' drawback. Distinguish this from digits added AS a prefix/suffix/copy-number outside the core word (e.g. 'bajaj2892', 'hacker2') — there, has_meaning is judged from the core word without the digits, and the trailing digits themselves can be noted as a minor drawback (looks like a copy/numbered account). false if the username is a random string of letters, an arbitrary combination with digits/prefixes/suffixes that doesn't read as a single word even after a reasonable substitution, even if part of a known word/brand can accidentally be spotted inside it (e.g. 'sbajaj2892' is false, because the digits and the extra 's' make it a meaningless jumble of characters rather than a meaningful handle, even though 'bajaj' appears inside it). Be strict about genuine noise, but do not penalize an ordinary, readable leetspeak digit-for-letter substitution inside a word.), \"comment\": \"brief description of the meaning/association of the username (e.g. for 'apple' — 'major tech company'), if the username has no clear meaning, leave null\"}")
+        return prompt,comparable_usd,offers_comparable_usd
 
     def _parse_ai_json(self,raw_text):
         cleaned=raw_text.strip().lstrip("\ufeff")
@@ -348,8 +531,8 @@ class VUsernameMod(loader.Module):
                 if parsed is not None:break
         return parsed
 
-    async def _ai_evaluate_async(self,api_key,model,username,fragment_status,price,is_taken=False):
-        prompt,comparable_usd=self._build_ai_prompt(username,fragment_status,price)
+    async def _ai_evaluate_async(self,api_key,model,username,fragment_status,price,is_taken=False,offers=None,similar_listings=None):
+        prompt,comparable_usd,offers_comparable_usd=self._build_ai_prompt(username,fragment_status,price,offers,similar_listings)
         is_gemini_3=bool(re.match(r"gemini-3",model,flags=re.IGNORECASE))
         thinking_config={"thinkingLevel":"minimal"}if is_gemini_3 else{"thinkingBudget":0}
         payload={"contents":[{"role":"user","parts":[{"text":prompt}]}],"generationConfig":{"maxOutputTokens":1024,"responseMimeType":"application/json","thinkingConfig":thinking_config}}
@@ -378,7 +561,7 @@ class VUsernameMod(loader.Module):
                                         break
                             except(ValueError,TypeError,json.JSONDecodeError):
                                 pass
-                        logger.warning("Gemini quota исчерпана для @%s",username)
+                        logger.warning("Gemini quota exhausted for @%s",username)
                         return False,(str(int(retry_delay))if retry_delay else""),"quota"
                     if status in(400,401,403):
                         error_message="";error_reason=""
@@ -398,7 +581,7 @@ class VUsernameMod(loader.Module):
                         body=""if error_type=="auth"else f"HTTP {status}: {error_message}"if error_message else f"HTTP {status}"
                         return False,body,error_type
                     if status==404:
-                        logger.error("Gemini 404 (модель не найдена) для @%s",username)
+                        logger.error("Gemini 404 (model not found) for @%s",username)
                         return False,"","model_not_found"
                     if status>=500:
                         logger.error("Gemini server error %s",status)
@@ -421,7 +604,7 @@ class VUsernameMod(loader.Module):
                     if parsed is None:
                         logger.warning("Gemini non-JSON response: %s",self._redact(raw_text[:500]))
                         return False,self._t("Модель вернула некорректный JSON. Попробуйте ещё раз.","The model returned invalid JSON. Please try again."),"json_parse"
-                    return self._process_ai_response(parsed,username,fragment_status,price,comparable_usd,model,is_taken)
+                    return self._process_ai_response(parsed,username,fragment_status,price,comparable_usd,model,is_taken,offers_comparable_usd)
             except(aiohttp.ClientError,asyncio.TimeoutError)as e:
                 logger.warning("Gemini request error (attempt %d): %s",attempt+1,self._redact(str(e)))
                 if attempt<max_retries-1:
@@ -433,8 +616,8 @@ class VUsernameMod(loader.Module):
                 return False,str(e),"unknown"
         return False,self._t("Превышено число попыток","Retry limit exceeded"),"unknown"
 
-    async def _ai_evaluate_groq_async(self,api_key,model,username,fragment_status,price,is_taken=False):
-        prompt,comparable_usd=self._build_ai_prompt(username,fragment_status,price)
+    async def _ai_evaluate_groq_async(self,api_key,model,username,fragment_status,price,is_taken=False,offers=None,similar_listings=None):
+        prompt,comparable_usd,offers_comparable_usd=self._build_ai_prompt(username,fragment_status,price,offers,similar_listings)
         payload={"model":model,"messages":[{"role":"user","content":prompt}],"response_format":{"type":"json_object"},"max_tokens":1024,"temperature":0.3,"stream":False}
         url="https://api.groq.com/openai/v1/chat/completions"
         headers={"Authorization":f"Bearer {api_key}"}
@@ -454,7 +637,7 @@ class VUsernameMod(loader.Module):
                         logger.error("Groq HTTP %s: %s",status,self._redact(str(data)[:300]if data else''))
                         return False,"","auth"
                     if status==404:
-                        logger.error("Groq 404 (модель не найдена) для @%s",username)
+                        logger.error("Groq 404 (model not found) for @%s",username)
                         return False,"","model_not_found"
                     if status>=500:
                         logger.error("Groq server error %s",status)
@@ -469,6 +652,14 @@ class VUsernameMod(loader.Module):
                             try:detail=(await resp.text())[:300]
                             except Exception:detail=''
                         logger.error("Groq HTTP %s: %s",status,self._redact(detail))
+                        error_message=""
+                        if isinstance(data,dict):
+                            error_message=str((data.get("error")or{}).get("message")or"")
+                        if status==400 and"generate json"in error_message.lower():
+                            if attempt<max_retries-1:
+                                await asyncio.sleep(2**attempt)
+                                continue
+                            return False,self._t("Groq не смог сгенерировать корректный JSON-ответ. Попробуйте ещё раз.","Groq failed to generate a valid JSON response. Please try again."),"json_parse"
                         return False,f"HTTP {status}: {detail}","unknown"
                     choices=(data or{}).get("choices",[])
                     raw_text=(choices[0].get("message",{}).get("content","")if choices else"").strip()
@@ -481,7 +672,7 @@ class VUsernameMod(loader.Module):
                     if parsed is None:
                         logger.warning("Groq non-JSON response: %s",self._redact(raw_text[:500]))
                         return False,self._t("Модель вернула некорректный JSON. Попробуйте ещё раз.","The model returned invalid JSON. Please try again."),"json_parse"
-                    return self._process_ai_response(parsed,username,fragment_status,price,comparable_usd,model,is_taken)
+                    return self._process_ai_response(parsed,username,fragment_status,price,comparable_usd,model,is_taken,offers_comparable_usd)
             except(aiohttp.ClientError,asyncio.TimeoutError)as e:
                 logger.warning("Groq request error (attempt %d): %s",attempt+1,self._redact(str(e)))
                 if attempt<max_retries-1:
@@ -493,12 +684,12 @@ class VUsernameMod(loader.Module):
                 return False,str(e),"unknown"
         return False,self._t("Превышено число попыток","Retry limit exceeded"),"unknown"
 
-    def _process_ai_response(self,parsed,username,fragment_status,price,comparable_usd,model=None,is_taken=False):
+    def _process_ai_response(self,parsed,username,fragment_status,price,comparable_usd,model=None,is_taken=False,offers_comparable_usd=None):
         def esc(v):return html.escape(str(v),quote=True)if v is not None else""
         is_ru=self._is_ru()
         lines=[]
         fragment_url=f"https://fragment.com/username/{username}"
-        show_link=bool(price)and fragment_status in(FragmentStatus.SOLD,FragmentStatus.AVAILABLE)
+        show_link=(bool(price)and fragment_status in(FragmentStatus.SOLD,FragmentStatus.AVAILABLE))or is_taken
         if fragment_status is FragmentStatus.SOLD and price:
             label=f"<b>Продан на Fragment | Цена: {esc(price)} GRAM</b>"if is_ru else f"<b>Sold on Fragment | Price: {esc(price)} GRAM</b>"
             lines.append(f"{self._emoji('stats')} {self._emoji('success')} {label}")
@@ -551,6 +742,11 @@ class VUsernameMod(loader.Module):
                 price_high=max(price_high,price_low+round_to)
                 if price_low>=price_high:
                     price_low,price_high=max(lo_bound,price_high*0.7),price_high
+                if is_taken:
+                    theoretical_cap=300
+                    price_high=min(price_high,theoretical_cap)
+                    price_low=min(price_low,theoretical_cap*0.4)
+                    if price_low>=price_high:price_low=max(1,price_high*0.5)
             else:
                 try:
                     price_low=float(price_low);price_high=float(price_high)
@@ -563,25 +759,34 @@ class VUsernameMod(loader.Module):
                 except(TypeError,ValueError):
                     rank_weight=1.0
                 rank_weight=rank_weight**2
-                price_low=fallback_low+rank_weight*(price_low-fallback_low)
-                price_high=fallback_high+rank_weight*(price_high-fallback_high)
-                beauty_floor_low=max(1,round(base*0.3))
-                beauty_floor_high=max(beauty_floor_low+1,round(base*0.5))
-                price_low=max(price_low,beauty_floor_low)
-                price_high=max(price_high,beauty_floor_high)
-                hard_cap=30
-                price_low=min(price_low,hard_cap)
-                price_high=min(price_high,hard_cap)
-                if price_low>price_high:
-                    price_low,price_high=price_high,price_low
-                h=int(hashlib.sha256(username.lower().encode()).hexdigest(),16)
-                jitter=((h%1000)/1000-0.5)*0.5
-                price_low=max(1.0,price_low*(1+jitter))
-                price_high=max(price_low+1.0,price_high*(1+jitter))
-                price_low=min(price_low,hard_cap)
-                price_high=min(price_high,hard_cap)
-                if price_low>price_high:
-                    price_low,price_high=price_high,price_low
+                if parsed.get("has_meaning") is True:
+                    rank_factor=0.55+0.45*rank_weight
+                    price_low=max(1.0,float(price_low)*rank_factor)
+                    price_high=max(price_low+1.0,float(price_high)*rank_factor)
+                    price_low=min(price_low,1000.0)
+                    price_high=min(max(price_high,price_low+1.0),1000.0)
+                    if price_low>price_high:
+                        price_low,price_high=price_high,price_low
+                else:
+                    price_low=fallback_low+rank_weight*(price_low-fallback_low)
+                    price_high=fallback_high+rank_weight*(price_high-fallback_high)
+                    beauty_floor_low=max(1,round(base*0.3))
+                    beauty_floor_high=max(beauty_floor_low+1,round(base*0.5))
+                    price_low=max(price_low,beauty_floor_low)
+                    price_high=max(price_high,beauty_floor_high)
+                    hard_cap=30
+                    price_low=min(price_low,hard_cap)
+                    price_high=min(price_high,hard_cap)
+                    if price_low>price_high:
+                        price_low,price_high=price_high,price_low
+                    h=int(hashlib.sha256(username.lower().encode()).hexdigest(),16)
+                    jitter=((h%1000)/1000-0.5)*0.5
+                    price_low=max(1.0,price_low*(1+jitter))
+                    price_high=max(price_low+1.0,price_high*(1+jitter))
+                    price_low=min(price_low,hard_cap)
+                    price_high=min(price_high,hard_cap)
+                    if price_low>price_high:
+                        price_low,price_high=price_high,price_low
 
         if not comparable_usd and parsed.get("has_meaning")is False:
             cap=max(1,min(5,10-length))
@@ -605,9 +810,19 @@ class VUsernameMod(loader.Module):
         if is_taken and not comparable_usd:
             is_beautiful=(not has_digits)and(not has_underscore)and length<=7
             taken_multiplier=2.2 if is_beautiful else 1.5
-            price_low=min(round(price_low*taken_multiplier),30)
-            price_high=min(round(price_high*taken_multiplier),30)
-            if price_low>=price_high:price_high=price_low+1
+            taken_cap=1000 if parsed.get("has_meaning") is True else 30
+            price_low=min(round(price_low*taken_multiplier),taken_cap)
+            price_high=min(round(price_high*taken_multiplier),taken_cap)
+            if price_low>=price_high:price_high=min(price_low+1,taken_cap)
+
+        if offers_comparable_usd:
+            median_offer_usd,max_offer_usd=offers_comparable_usd
+            if median_offer_usd and max_offer_usd and max_offer_usd>0:
+                floor_low=max(1.0,median_offer_usd*0.5)
+                floor_high=max(floor_low+1.0,min(max_offer_usd*0.85,median_offer_usd*3))
+                if price_low<floor_low:price_low=floor_low
+                if price_high<floor_high:price_high=floor_high
+                if price_low>=price_high:price_high=price_low+max(1.0,price_low*0.3)
 
         def fmt_price(v):
             try:
@@ -628,6 +843,8 @@ class VUsernameMod(loader.Module):
             points=[]
             for item in raw or[]:
                 text=str(item).strip()
+                if not text:continue
+                text=re.sub(r"^\s*\d+\s*[.)-]\s*", "", text).strip()
                 if not text:continue
                 if text.strip(".!").lower()in placeholder_words:continue
                 points.append(text)
@@ -657,16 +874,21 @@ class VUsernameMod(loader.Module):
             figure_text=f"{esc(public_figure)}"
             if figure_note:figure_text+=f" — {esc(figure_note)}"
             lines.append(f"{self._emoji('chart')} <b>{self.strings['ai_figure_label']}:</b>\n<blockquote expandable>{figure_text}</blockquote>")
+        else:
+            comment_text=str(parsed.get("comment")or"").strip()
+            if comment_text:
+                lines.append(f"{self._emoji('comment')} <b>{self.strings['ai_comment_label']}:</b>\n<blockquote expandable>{esc(comment_text)}</blockquote>")
+
         return True,"\n".join(lines),None
 
-    async def _run_gemini_provider(self,username,fragment_status,price,is_taken=False):
+    async def _run_gemini_provider(self,username,fragment_status,price,is_taken=False,offers=None,similar_listings=None):
         model=str(self.config["ai_model"]or"").strip()or"gemini-3.5-flash"
         max_attempts=3
         last_result=(False,"","no_key")
         for attempt in range(1,max_attempts+1):
             api_key=await self._get_next_ai_key()
             if not api_key:break
-            result=await self._ai_evaluate_async(api_key,model,username,fragment_status,price,is_taken)
+            result=await self._ai_evaluate_async(api_key,model,username,fragment_status,price,is_taken,offers,similar_listings)
             success,body,error_type=result
             last_result=result
             if success:return result
@@ -677,17 +899,17 @@ class VUsernameMod(loader.Module):
             if has_other_key:
                 continue
             if error_type=="quota":
-                logger.warning("AI-запрос для @%s: квота Gemini исчерпана",username)
+                logger.warning("AI request for @%s: Gemini quota exhausted",username)
                 break
             if error_type=="auth":
-                logger.warning("AI-запрос для @%s: нет рабочих ключей Gemini (auth)",username)
+                logger.warning("AI request for @%s: no working Gemini keys (auth)",username)
                 break
             delay=min(attempt,3)
-            logger.warning("AI-запрос для @%s не удался (попытка %d/%d, тип=%s), повтор через %ss",username,attempt,max_attempts,error_type,delay)
+            logger.warning("AI request for @%s failed (attempt %d/%d, type=%s), retrying in %ss",username,attempt,max_attempts,error_type,delay)
             await asyncio.sleep(delay)
         return last_result
 
-    async def _run_groq_provider(self,username,fragment_status,price,is_taken=False):
+    async def _run_groq_provider(self,username,fragment_status,price,is_taken=False,offers=None,similar_listings=None):
         groq_keys=self._refresh_groq_api_keys()
         if not groq_keys:return(False,"","no_key")
         groq_model=str(self.config["groq_model"]or"").strip()or"openai/gpt-oss-120b"
@@ -696,7 +918,7 @@ class VUsernameMod(loader.Module):
         for ds_attempt in range(1,ds_max_attempts+1):
             ds_key=await self._get_next_groq_key()
             if not ds_key:break
-            ds_result=await self._ai_evaluate_groq_async(ds_key,groq_model,username,fragment_status,price,is_taken)
+            ds_result=await self._ai_evaluate_groq_async(ds_key,groq_model,username,fragment_status,price,is_taken,offers,similar_listings)
             ds_success,ds_body,ds_error_type=ds_result
             last_result=ds_result
             if ds_success:return ds_result
@@ -706,22 +928,52 @@ class VUsernameMod(loader.Module):
             if not has_other_ds_key and ds_attempt>=ds_max_attempts:break
         return last_result
 
-    async def _ai_evaluate(self,username,fragment_status,price,is_taken=False):
+    def _provider_label(self,provider_key):
+        return{"gemini":"Gemini","groq":"Groq"}.get(provider_key,provider_key or"")
+
+    def _ai_error_short(self,error_type,body=""):
+        mapping={
+            "quota":self.strings.get("ai_err_quota"),
+            "auth":self.strings.get("ai_err_auth"),
+            "server":self.strings.get("ai_err_server"),
+            "network":self.strings.get("ai_err_network"),
+            "json_parse":self.strings.get("ai_err_json"),
+            "no_key":self.strings.get("ai_err_no_key"),
+            "model_not_found":self.strings.get("ai_err_model_not_found"),
+        }
+        label=mapping.get(error_type)
+        if label:return label
+        if body:return html.escape(str(body)[:120],quote=True)
+        return self.strings.get("ai_err_unknown")
+
+    async def _ai_evaluate(self,username,fragment_status,price,is_taken=False,offers=None,similar_listings=None):
         provider=str(self.config["ai_provider"]or"auto").strip().lower()
         if provider=="groq":
-            return await self._run_groq_provider(username,fragment_status,price,is_taken)
+            result=await self._run_groq_provider(username,fragment_status,price,is_taken,offers,similar_listings)
+            return(*result,{"provider":"groq"})
         if provider=="gemini":
-            return await self._run_gemini_provider(username,fragment_status,price,is_taken)
-        primary_name,primary,fallback_name,fallback="Gemini",self._run_gemini_provider,"Groq",self._run_groq_provider
-        primary_result=await primary(username,fragment_status,price,is_taken)
-        if primary_result[0]:return primary_result
-        logger.info("%s не сработал для @%s (тип=%s), пробуем %s как fallback",primary_name,username,primary_result[2],fallback_name)
-        fallback_result=await fallback(username,fragment_status,price,is_taken)
+            result=await self._run_gemini_provider(username,fragment_status,price,is_taken,offers,similar_listings)
+            return(*result,{"provider":"gemini"})
+        primary_key,primary,fallback_key,fallback="gemini",self._run_gemini_provider,"groq",self._run_groq_provider
+        primary_result=await primary(username,fragment_status,price,is_taken,offers,similar_listings)
+        if primary_result[0]:return(*primary_result,{"provider":primary_key})
+        logger.info("%s failed for @%s (type=%s), trying %s as fallback",primary_key,username,primary_result[2],fallback_key)
+        fallback_result=await fallback(username,fragment_status,price,is_taken,offers,similar_listings)
         if fallback_result[0]:
-            logger.info("%s fallback сработал для @%s",fallback_name,username)
-            return fallback_result
-        if primary_result[2]=="no_key"and fallback_result[2]!="no_key":return fallback_result
-        return primary_result
+            logger.info("%s fallback succeeded for @%s",fallback_key,username)
+            return(*fallback_result,{"provider":fallback_key})
+        if primary_result[2]=="no_key"and fallback_result[2]!="no_key":
+            return(*fallback_result,{"provider":fallback_key})
+        if fallback_result[2]=="no_key"and primary_result[2]!="no_key":
+            return(*primary_result,{"provider":primary_key})
+        if primary_result[2]=="no_key"and fallback_result[2]=="no_key":
+            return(*primary_result,{"provider":primary_key})
+        logger.warning("Both providers failed for @%s: gemini=%s, groq=%s",username,primary_result[2],fallback_result[2])
+        return(False,primary_result[1],"double_fail",{
+            "provider":primary_key,
+            "gemini":(primary_result[2],primary_result[1]),
+            "groq":(fallback_result[2],fallback_result[1]),
+        })
 
     async def _download_avatar_async(self,url):
         current_url=url
@@ -787,7 +1039,7 @@ class VUsernameMod(loader.Module):
             await self._client(functions.channels.EditPhotoRequest(channel=channel,photo=InputChatUploadedPhoto(file=uploaded)))
             return True
         except Exception:
-            logger.exception("Не удалось установить аватар канала")
+            logger.exception("Failed to set the channel avatar")
             return False
 
     async def _cleanup_service_messages(self,channel):
@@ -795,15 +1047,15 @@ class VUsernameMod(loader.Module):
             async for message in self._client.iter_messages(channel,limit=10):
                 if not message.action:continue
                 try:await message.delete()
-                except Exception as e:logger.debug("Не удалось удалить сервисное сообщение %s: %s",getattr(message,"id","?"),e)
-        except Exception as e:logger.debug("Не удалось очистить сервисные сообщения: %s",e)
+                except Exception as e:logger.debug("Failed to delete service message %s: %s",getattr(message,"id","?"),e)
+        except Exception as e:logger.debug("Failed to clean up service messages: %s",e)
 
     async def _rollback_channel(self,channel):
         try:
             await self._client(functions.channels.DeleteChannelRequest(channel=channel))
             return True
         except Exception:
-            logger.exception("Не удалось удалить временный канал после ошибки захвата")
+            logger.exception("Failed to delete the temporary channel after a claim error")
             return False
 
     async def _grab_username(self,username):
@@ -815,7 +1067,7 @@ class VUsernameMod(loader.Module):
             try:
                 me=await self._client.get_me()
                 own_username=getattr(me,"username",None)
-            except Exception:logger.debug("Не удалось получить собственный юзернейм для описания канала")
+            except Exception:logger.debug("Failed to get own username for the channel description")
             about=about.replace("{me}",f"@{own_username}"if own_username else"")
         channel_message=str(self.config["channel_message"]or"").strip()or None
         if channel_message and"{me}"in channel_message:
@@ -823,27 +1075,27 @@ class VUsernameMod(loader.Module):
             try:
                 me_msg=await self._client.get_me()
                 own_username_msg=getattr(me_msg,"username",None)
-            except Exception:logger.debug("Не удалось получить собственный юзернейм для сообщения канала")
+            except Exception:logger.debug("Failed to get own username for the channel post")
             channel_message=channel_message.replace("{me}",f"@{own_username_msg}"if own_username_msg else"")
         if not title.strip():return GrabStatus.BAD_TITLE,None,False
         try:
             result=await self._client(functions.channels.CreateChannelRequest(title=title,about=about,broadcast=True,megagroup=False))
             chats=getattr(result,"chats",None)
             if not chats:
-                logger.error("CreateChannelRequest вернул результат без chats")
+                logger.error("CreateChannelRequest returned a result with no chats")
                 return GrabStatus.ERROR,None,False
             channel=chats[0]
             update_result=await self._client(functions.channels.UpdateUsernameRequest(channel=channel,username=username))
             if not update_result:
-                logger.error("UpdateUsernameRequest вернул False для @%s",username)
+                logger.error("UpdateUsernameRequest returned False for @%s",username)
                 rollback_failed=not await self._rollback_channel(channel)
                 return GrabStatus.ERROR,None,rollback_failed
         except Exception as error:
             status,detail=self._classify_grab_error(error)
             if status is GrabStatus.ERROR:
-                logger.exception("Ошибка при захвате @%s",username)
+                logger.exception("Error while claiming @%s",username)
             else:
-                logger.warning("Не удалось занять @%s: %s",username,type(error).__name__)
+                logger.warning("Failed to claim @%s: %s",username,type(error).__name__)
             rollback_failed=False
             if channel is not None:
                 rollback_failed=not await self._rollback_channel(channel)
@@ -856,7 +1108,7 @@ class VUsernameMod(loader.Module):
                 await self._client.send_message(channel,channel_message,parse_mode="html")
             except Exception:
                 firstpost_ok=False
-                logger.exception("Не удалось отправить первый пост в канал @%s",username)
+                logger.exception("Failed to send the first post to channel @%s",username)
         if avatar_ok and firstpost_ok:status=GrabStatus.SUCCESS
         elif not avatar_ok and firstpost_ok:status=GrabStatus.SUCCESS_AVATAR_FAILED
         elif avatar_ok and not firstpost_ok:status=GrabStatus.SUCCESS_FIRSTPOST_FAILED
@@ -912,12 +1164,12 @@ class VUsernameMod(loader.Module):
         try:
             updated=await utils.answer(target,text)
             return updated or target
-        except Exception as e:logger.warning("Не удалось обновить статус поиска: %s",e)
+        except Exception as e:logger.warning("Failed to update search status: %s",e)
         if target is not message:
             try:
                 updated=await utils.answer(message,text)
                 return updated or message
-            except Exception as e:logger.warning("Не удалось восстановить статус поиска: %s",e)
+            except Exception as e:logger.warning("Failed to restore search status: %s",e)
         return status_message
 
     def _get_search_delay(self):
@@ -959,7 +1211,7 @@ class VUsernameMod(loader.Module):
     async def _mark_ai_key_bad(self,key):
         async with self.key_lock:
             self.key_status[key]=False
-            logger.warning("Gemini-ключ %s… временно исключён из ротации",key[:8])
+            logger.warning("Gemini key %s… temporarily excluded from rotation",key[:8])
 
     def _refresh_groq_api_keys(self):
         raw_keys=str(self.config["groq_api_keys"]or"")
@@ -987,7 +1239,7 @@ class VUsernameMod(loader.Module):
     async def _mark_groq_key_bad(self,key):
         async with self.groq_key_lock:
             self.groq_key_status[key]=False
-            logger.warning("Groq-ключ %s… временно исключён из ротации",key[:8])
+            logger.warning("Groq key %s… temporarily excluded from rotation",key[:8])
 
     @staticmethod
     def _error_signature(error):
@@ -1097,7 +1349,7 @@ class VUsernameMod(loader.Module):
             if error:return None
             return valid
         except Exception:
-            logger.exception("Не удалось получить юзернейм из реплая")
+            logger.exception("Failed to get the username from the reply")
             return None
 
     async def _get_own_usernames(self):
@@ -1110,7 +1362,7 @@ class VUsernameMod(loader.Module):
             for extra in getattr(me,"usernames",None)or[]:
                 value=getattr(extra,"username",None)
                 if value:usernames.add(value.lower())
-        except Exception:logger.exception("Не удалось получить собственные юзернеймы аккаунта")
+        except Exception:logger.exception("Failed to get the account's own usernames")
         self._own_usernames=usernames
         return usernames
 
@@ -1124,8 +1376,8 @@ class VUsernameMod(loader.Module):
             return UsernameStatus.UNAVAILABLE,None
         except Exception as e:
             status,wait=self._classify_check_error(e)
-            if status is UsernameStatus.ERROR:logger.exception("Ошибка при проверке юзернейма @%s",username)
-            elif status is UsernameStatus.FLOOD_WAIT:logger.warning("FloodWait %ss при проверке @%s",wait or 0,username)
+            if status is UsernameStatus.ERROR:logger.exception("Error while checking username @%s",username)
+            elif status is UsernameStatus.FLOOD_WAIT:logger.warning("FloodWait %ss while checking @%s",wait or 0,username)
             return status,wait
 
     @classmethod
@@ -1177,7 +1429,7 @@ class VUsernameMod(loader.Module):
         loading=await self.inline.form(text=plain_emoji(self.strings["checking"].format(username=safe_username)),message=message,reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]])
         inline_loading=bool(loading)
         if not loading:loading=await utils.answer(message,self.strings["checking"].format(username=safe_username))
-        fragment_status,price=await self._check_fragment(username)
+        fragment_status,price,_offers=await self._check_fragment(username)
         fragment_url=f"https://fragment.com/username/{username}"
         safe_url=html.escape(fragment_url,quote=True)
         safe_price=html.escape(str(price),quote=True)if price else""
@@ -1215,7 +1467,7 @@ class VUsernameMod(loader.Module):
             try:
                 await loading.edit(text=plain_emoji(text),reply_markup=result_markup)
                 return
-            except Exception as e:logger.warning("Не удалось обновить inline-результат: %s",e)
+            except Exception as e:logger.warning("Failed to update the inline result: %s",e)
         await self._edit_status(loading,message,text)
 
     @loader.command(ru_doc="[юзернейм] — проверяет доступность и даёт кнопку \"занять\".",en_doc="[username] — checks availability and gives a \"claim\" button.")
@@ -1248,33 +1500,44 @@ class VUsernameMod(loader.Module):
             await utils.answer(message,self.strings["ai_no_key"]);return
         safe_username=html.escape(username,quote=True)
         status_message=await utils.answer(message,self.strings["ai_evaluating"].format(username=safe_username))
-        fragment_status,price=await self._check_fragment(username)
+        fragment_status,price,offers=await self._check_fragment(username)
         username_status,_=await self._check(username)
-        is_taken=username_status is UsernameStatus.UNAVAILABLE
-        cache_key=f"{username}|{fragment_status.value}|{price or''}|{int(is_taken)}"
+        is_taken=username_status is not UsernameStatus.AVAILABLE and fragment_status not in(FragmentStatus.SOLD,FragmentStatus.AVAILABLE)
+        similar_listings=await self._fetch_similar_listings(username)
+        offers_key=",".join(f"{v:.0f}"for v in sorted(offers,reverse=True)[:8])if offers else""
+        similar_key=",".join(f"{u.lower()}:{s}:{p or''}"for u,s,p in similar_listings)
+        cache_key=f"{username}|{fragment_status.value}|{price or''}|{int(is_taken)}|{offers_key}|{similar_key}"
         now=time.monotonic()
         cached=self._ai_cache.get(cache_key)
         if cached and now-cached[0]<self.AI_CACHE_TTL:
-            success,body,error_type=cached[1]
+            success,body,error_type,ai_meta=cached[1]
         else:
-            success,body,error_type=await self._ai_evaluate(username,fragment_status,price,is_taken)
+            success,body,error_type,ai_meta=await self._ai_evaluate(username,fragment_status,price,is_taken,offers,similar_listings)
             if success:
-                self._ai_cache[cache_key]=(now,(success,body,error_type))
+                self._ai_cache[cache_key]=(now,(success,body,error_type,ai_meta))
                 if len(self._ai_cache)>200:
                     expired=[k for k,(ts,_)in self._ai_cache.items()if now-ts>=self.AI_CACHE_TTL]
                     for k in expired:self._ai_cache.pop(k,None)
         if not success:
-            if error_type=="no_key":text=self.strings["ai_no_key"]
-            elif error_type=="quota":text=self.strings["ai_error_quota_retry"].format(seconds=body)if body else self.strings["ai_error_quota"]
-            elif error_type=="auth":text=self.strings["ai_error_auth"]
-            elif error_type=="server":text=self.strings["ai_error_server"]
+            provider_label=self._provider_label((ai_meta or{}).get("provider"))
+            if error_type=="double_fail":
+                gem_error_type,gem_body=(ai_meta or{}).get("gemini",("unknown",""))
+                groq_error_type,groq_body=(ai_meta or{}).get("groq",("unknown",""))
+                text=self.strings["ai_error_both"].format(
+                    gemini_error=self._ai_error_short(gem_error_type,gem_body),
+                    groq_error=self._ai_error_short(groq_error_type,groq_body),
+                )
+            elif error_type=="no_key":text=self.strings["ai_no_key"]
+            elif error_type=="quota":text=self.strings["ai_error_quota_retry"].format(seconds=body,provider=provider_label)if body else self.strings["ai_error_quota"].format(provider=provider_label)
+            elif error_type=="auth":text=self.strings["ai_error_auth"].format(provider=provider_label)
+            elif error_type=="server":text=self.strings["ai_error_server"].format(provider=provider_label)
             elif error_type=="model_not_found":text=self.strings["ai_error_model_not_found"]
-            else:text=self.strings["ai_error_unknown"].format(error=html.escape(body,quote=True))
+            else:text=self.strings["ai_error_unknown"].format(provider=provider_label,error=html.escape(body,quote=True))
             await utils.answer(status_message or message,text);return
         availability_note=""
         if username_status is UsernameStatus.AVAILABLE:
             availability_note=self.strings["ai_note_available"].format(username=safe_username)
-        elif username_status is UsernameStatus.UNAVAILABLE and fragment_status not in(FragmentStatus.SOLD,FragmentStatus.AVAILABLE):
+        elif fragment_status not in(FragmentStatus.SOLD,FragmentStatus.AVAILABLE):
             availability_note=self.strings["ai_note_taken_regular"]
         result_text=self.strings["ai_result"].format(username=safe_username,body=availability_note+body)
         await utils.answer(status_message or message,result_text)
@@ -1287,7 +1550,7 @@ class VUsernameMod(loader.Module):
             try:
                 await status_message.edit(text=plain_emoji(text),reply_markup=self._find_stop_markup())
                 return status_message
-            except Exception as e:logger.warning("Не удалось обновить inline-прогресс поиска: %s",e);return status_message
+            except Exception as e:logger.warning("Failed to update the inline search progress: %s",e);return status_message
         return await self._edit_status(status_message,message,text)
 
     async def _finish_find_text(self,status_message,message,text,inline_status):
@@ -1295,7 +1558,7 @@ class VUsernameMod(loader.Module):
             try:
                 await status_message.edit(text=plain_emoji(text),reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]])
                 return
-            except Exception:logger.exception("Не удалось обновить финальное inline-состояние поиска")
+            except Exception:logger.exception("Failed to update the final inline search state")
         await self._edit_status(status_message,message,text)
 
     async def _finish_find_results(self,status_message,message,found,mode_text,inline_status):
@@ -1306,12 +1569,12 @@ class VUsernameMod(loader.Module):
             try:
                 await status_message.edit(text=plain_emoji(page_text),reply_markup=page_buttons)
                 return
-            except Exception:logger.exception("Не удалось превратить прогресс поиска в результаты")
+            except Exception:logger.exception("Failed to turn search progress into results")
         form=await self.inline.form(text=plain_emoji(page_text),message=message,reply_markup=page_buttons)
         if form:
             if status_message is not None and not inline_status:
                 try:await status_message.delete()
-                except Exception as e:logger.debug("Не удалось удалить сообщение прогресса после поиска: %s",e)
+                except Exception as e:logger.debug("Failed to delete the progress message after the search: %s",e)
             return
         fallback_items=found[:self.FALLBACK_DISPLAY_FOUND]
         fallback_lines="\n".join(f"• <code>@{html.escape(username)}</code>"for username in fallback_items)
@@ -1321,11 +1584,11 @@ class VUsernameMod(loader.Module):
     async def _find_stop_cb(self,call):
         if not self._find_running or self._find_stop_event is None:
             try:await call.answer(plain_emoji(self.strings["stop_idle_alert"]),show_alert=False)
-            except Exception as e:logger.debug("Не удалось ответить на неактуальную кнопку стоп: %s",e)
+            except Exception as e:logger.debug("Failed to respond to the stale stop button: %s",e)
             return
         self._find_stop_event.set()
         try:await call.answer(plain_emoji(self.strings["find_stopping"]),show_alert=False)
-        except Exception as e:logger.debug("Не удалось подтвердить остановку поиска: %s",e)
+        except Exception as e:logger.debug("Failed to confirm the search stop: %s",e)
 
     def _build_find_page(self,usernames,page,mode_text):
         if not usernames:
@@ -1348,14 +1611,14 @@ class VUsernameMod(loader.Module):
 
     async def _find_page_cb(self,call,usernames,page,mode_text):
         try:await call.answer()
-        except Exception as e:logger.debug("Не удалось подтвердить callback пагинации: %s",e)
+        except Exception as e:logger.debug("Failed to confirm the pagination callback: %s",e)
         if not usernames:
             try:await call.edit(text=plain_emoji(self.strings["find_page_empty"]),reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]])
-            except Exception:logger.exception("Не удалось показать пустую страницу результатов")
+            except Exception:logger.exception("Failed to show the empty results page")
             return
         text,buttons=self._build_find_page(tuple(usernames),int(page),mode_text)
         try:await call.edit(text=plain_emoji(text),reply_markup=buttons)
-        except Exception:logger.exception("Не удалось переключить страницу результатов")
+        except Exception:logger.exception("Failed to switch the results page")
 
     @loader.command(ru_doc="[число] | [префикс] — поиск свободных юзернеймов.",en_doc="[number] | [prefix] — search for available usernames.")
     async def vfind(self,message):
@@ -1433,7 +1696,7 @@ class VUsernameMod(loader.Module):
             await self._finish_find_results(status_message,message,found,mode_text,inline_status)
         except asyncio.CancelledError:raise
         except Exception:
-            logger.exception("Неожиданная ошибка поиска юзернеймов")
+            logger.exception("Unexpected error while searching for usernames")
             await self._finish_find_text(status_message,message,self.strings["find_error"].format(checked=checked,total=len(candidates)),inline_status)
         finally:
             self._find_running=False
@@ -1455,16 +1718,16 @@ class VUsernameMod(loader.Module):
         username,error=self._validate_username(username)
         if error or username is None:
             try:await call.answer(plain_emoji(self.strings["grab_invalid"]),show_alert=True)
-            except Exception as e:logger.debug("Не удалось ответить на устаревший callback: %s",e)
+            except Exception as e:logger.debug("Failed to respond to the stale callback: %s",e)
             return
         if self._grab_lock is None:self._grab_lock=asyncio.Lock()
         if self._grab_lock.locked():
             try:await call.answer(plain_emoji(self.strings["grab_busy"]),show_alert=False)
-            except Exception as e:logger.debug("Не удалось ответить на callback: %s",e)
+            except Exception as e:logger.debug("Failed to respond to the callback: %s",e)
             return
         async with self._grab_lock:
             try:await call.answer(plain_emoji(self.strings["grabbing"]),show_alert=False)
-            except Exception as e:logger.debug("Не удалось показать статус callback: %s",e)
+            except Exception as e:logger.debug("Failed to show the callback status: %s",e)
             status,info,rollback_failed=await self._grab_username(username)
             safe_username=html.escape(username,quote=True)
             if status in(GrabStatus.SUCCESS,GrabStatus.SUCCESS_AVATAR_FAILED,GrabStatus.SUCCESS_FIRSTPOST_FAILED,GrabStatus.SUCCESS_AVATAR_FIRSTPOST_FAILED):
@@ -1477,37 +1740,37 @@ class VUsernameMod(loader.Module):
                 text=self.strings["grab_error_title"].format(error=error_text,rollback_warning=rollback_warning)
             chat_id=None
             try:chat_id=call.form.get("chat")
-            except Exception as e:logger.debug("Не удалось получить chat id из inline-формы: %s",e)
+            except Exception as e:logger.debug("Failed to get the chat id from the inline form: %s",e)
             if chat_id is None:
-                logger.error("Не удалось отправить отдельный результат захвата @%s: chat id отсутствует в inline unit",username)
+                logger.error("Failed to send a standalone claim result for @%s: chat id missing from the inline unit",username)
                 try:await call.answer(plain_emoji(self.strings["grab_error"]),show_alert=True)
-                except Exception as e:logger.debug("Не удалось показать fallback alert: %s",e)
+                except Exception as e:logger.debug("Failed to show the fallback alert: %s",e)
                 return
             try:
                 result_form=await self.inline.form(text=plain_emoji(text),message=chat_id,reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]],silent=True)
             except Exception:
-                logger.exception("Не удалось создать отдельную inline-форму результата @%s",username)
+                logger.exception("Failed to create a standalone inline result form for @%s",username)
                 result_form=False
             if result_form:return
             try:
                 await self._client.send_message(chat_id,text,parse_mode="html",link_preview=False)
             except TypeError:await self._client.send_message(chat_id,text,parse_mode="html")
-            except Exception:logger.exception("Не удалось отправить отдельное сообщение результата @%s",username)
+            except Exception:logger.exception("Failed to send a standalone result message for @%s",username)
 
     async def _close_cb(self,call):
         try:await call.delete()
-        except Exception as e:logger.debug("Не удалось закрыть inline-форму: %s",e)
+        except Exception as e:logger.debug("Failed to close the inline form: %s",e)
 
     def _emoji(self,name:str,glyph:str=None)->str:
-        """Обёртка над модульной функцией emoji() для вызовов вида self._emoji('success')."""
+        """Wrapper around the module-level emoji() function for calls like self._emoji('success')."""
         return emoji(name,glyph)
 
     def _is_ru(self)->bool:
-        """Определяет, выбран ли сейчас русский язык интерфейса модуля.
+        """Determines whether the module's interface language is currently Russian.
 
-        self.strings["..."] уже проходит внутреннее разрешение языка (ru/en),
-        а self.strings_ru — это наш собственный «сырой» русский словарь.
-        Если резолвнутое значение совпадает с русским — значит активен русский.
+        self.strings["..."] already goes through internal language resolution (ru/en),
+        while self.strings_ru is our own "raw" Russian dictionary.
+        If the resolved value matches the Russian one, Russian is active.
         """
         try:
             return self.strings["close_button"]==self.strings_ru["close_button"]
@@ -1515,11 +1778,11 @@ class VUsernameMod(loader.Module):
             return False
 
     def _t(self,ru:str,en:str)->str:
-        """Короткий помощник локализации для строк, формируемых в коде (не из словаря strings)."""
+        """Short localization helper for strings built in code (not taken from the strings dict)."""
         return ru if self._is_ru()else en
 
     async def _get_local_source(self):
-        """Возвращает исходный код текущего загруженного модуля (через loader либо inspect)."""
+        """Returns the source code of the currently loaded module (via loader or inspect)."""
         import sys,inspect
         mod=sys.modules.get(self.__class__.__module__)
         ldr_obj=getattr(mod,"__loader__",None)
@@ -1527,35 +1790,35 @@ class VUsernameMod(loader.Module):
             try:
                 src=ldr_obj.get_source(self.__class__.__module__)
                 if src:return src
-            except Exception as e:logger.debug("Не удалось получить исходник через __loader__.get_source(): %s",e)
+            except Exception as e:logger.debug("Failed to get the source via __loader__.get_source(): %s",e)
         if mod:
             try:return inspect.getsource(mod)
-            except Exception as e:logger.debug("Не удалось получить исходник через inspect.getsource(): %s",e)
+            except Exception as e:logger.debug("Failed to get the source via inspect.getsource(): %s",e)
         return None
 
     def _hash_source(self,src)->str:
         return hashlib.sha256(src.encode("utf-8")).hexdigest()
 
     async def _fetch_remote_source(self):
-        """Скачивает актуальный код модуля с GitHub (raw). Возвращает bytes или None при ошибке."""
+        """Downloads the latest module code from GitHub (raw). Returns bytes or None on error."""
         try:
             session=await self._get_session()
             headers={"Cache-Control":"no-cache","Pragma":"no-cache"}
             bust_url=f"{self.UPDATE_URL}?_={int(time.time())}"
             async with session.get(bust_url,headers=headers,timeout=aiohttp.ClientTimeout(total=20))as resp:
                 if resp.status!=200:
-                    logger.warning("Автообновление: сервер вернул статус %s",resp.status)
+                    logger.warning("Auto-update: server returned status %s",resp.status)
                     return None
                 return await resp.read()
         except Exception as e:
-            logger.warning("Автообновление: не удалось скачать исходник — %s",e)
+            logger.warning("Auto-update: failed to download the source — %s",e)
             return None
 
     async def _safe_install_update(self)->bool:
-        """Устанавливает свежую версию модуля через Loader."""
+        """Installs the fresh module version via the Loader."""
         ldr=self.lookup("Loader")
         if not ldr or not hasattr(ldr,"download_and_install"):
-            logger.error("Автообновление: модуль Loader недоступен")
+            logger.error("Auto-update: the Loader module is unavailable")
             return False
         try:
             res=await asyncio.wait_for(ldr.download_and_install(self.UPDATE_URL),timeout=self.UPDATE_INSTALL_TIMEOUT)
@@ -1563,37 +1826,37 @@ class VUsernameMod(loader.Module):
                 ldr.update_modules_in_db()
             return res==1
         except asyncio.TimeoutError:
-            logger.warning("Автообновление: установка не удалась — таймаут (%s сек)",self.UPDATE_INSTALL_TIMEOUT)
+            logger.warning("Auto-update: install failed — timeout (%s sec)",self.UPDATE_INSTALL_TIMEOUT)
             return False
         except Exception as e:
-            logger.warning("Автообновление: установка не удалась — %s",e)
+            logger.warning("Auto-update: install failed — %s",e)
             return False
 
     async def _check_update_hashes(self):
-        """Сравнивает хэш локального и удалённого кода. Возвращает (differs:bool|None, remote_ok:bool)."""
+        """Compares the hash of the local and remote code. Returns (differs:bool|None, remote_ok:bool)."""
         remote_bytes=await self._fetch_remote_source()
         if not remote_bytes:return None,False
         remote_hash=hashlib.sha256(remote_bytes).hexdigest()
         local_src=await self._get_local_source()
         local_hash=self._hash_source(local_src)if local_src else""
         if not local_hash:
-            logger.warning("Автообновление: не удалось получить хэш локальной версии, считаем что различаются")
+            logger.warning("Auto-update: failed to get the local version hash, assuming they differ")
             return True,True
         return remote_hash!=local_hash,True
 
     async def _upd_force_cb(self,call):
         try:await call.answer()
-        except Exception as e:logger.debug("Не удалось ответить на callback обновления: %s",e)
+        except Exception as e:logger.debug("Failed to respond to the update callback: %s",e)
         try:await call.edit(plain_emoji(self.strings["upd_downloading"]))
-        except Exception as e:logger.debug("Не удалось обновить текст формы обновления: %s",e)
+        except Exception as e:logger.debug("Failed to update the update-form text: %s",e)
         ok=await self._safe_install_update()
         text=self.strings["upd_done"]if ok else self.strings["upd_fail"]
         try:await call.edit(plain_emoji(text))
-        except Exception as e:logger.debug("Не удалось показать результат обновления: %s",e)
+        except Exception as e:logger.debug("Failed to show the update result: %s",e)
 
     async def _upd_cancel_cb(self,call):
         try:await call.delete()
-        except Exception as e:logger.debug("Не удалось закрыть форму обновления: %s",e)
+        except Exception as e:logger.debug("Failed to close the update form: %s",e)
 
     @loader.command(ru_doc="[-f|--force] — проверить и установить обновление модуля вручную.",en_doc="[-f|--force] — manually check for and install a module update.")
     async def vupdate(self,message):
@@ -1638,11 +1901,14 @@ class VUsernameMod(loader.Module):
             await asyncio.sleep(300)
             now=time.monotonic()
             async with self._fragment_cache_lock:
-                expired=[k for k,(ts,_,_)in self._fragment_cache.items()if now-ts>=self.FRAGMENT_CACHE_TTL]
+                expired=[k for k,(ts,_,_,_)in self._fragment_cache.items()if now-ts>=self.FRAGMENT_CACHE_TTL]
                 for k in expired:self._fragment_cache.pop(k,None)
             expired_ai=[k for k,(ts,_)in self._ai_cache.items()if now-ts>=self.AI_CACHE_TTL]
             for k in expired_ai:self._ai_cache.pop(k,None)
-            logger.debug("Cache cleaner: removed %d fragment, %d ai entries",len(expired),len(expired_ai))
+            async with self._similar_cache_lock:
+                expired_similar=[k for k,(ts,_)in self._similar_cache.items()if now-ts>=self.SIMILAR_CACHE_TTL]
+                for k in expired_similar:self._similar_cache.pop(k,None)
+            logger.debug("Cache cleaner: removed %d fragment, %d ai, %d similar entries",len(expired),len(expired_ai),len(expired_similar))
 
     async def on_unload(self):
         if self._cleaner_task and not self._cleaner_task.done():

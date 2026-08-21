@@ -10,7 +10,7 @@
 # meta help: @latexmods, @qhozek
 # meta developer: @lceta
 
-__version__ = (2, 0, 2)
+__version__ = (2, 0, 3)
 
 # ░█░░░█▀▀░█▀▀░▀█▀░█▀█
 # ░█░░░█░░░█▀▀░░█░░█▀█
@@ -60,8 +60,8 @@ class GrabStatus(Enum):
 @loader.tds
 class VUsernameMod(loader.Module):
     """Check usernames, AI valuation, and search for available ones via Fragment."""
-    strings={"name":"VUsername","no_args":"<b>{E_error} specify a username!!</b>","bad_length":"<b>{E_error} username must be 4 to 32 characters long!!</b>","bad_chars":"<b>{E_error} only latin letters, digits and _ are allowed in the username!!</b>","available":"username <b>@{username}</b> is available!!!\n\nwant to claim this username?","available_no_inline":"{E_boom} <b>@{username}</b> is available, but the inline form could not be created. Try the command again later.","grab_button":"✔ claim","close_button":"✖ close","checking":"<b>checking.. @{username}...</b>","fragment_sold":"{E_error} <b>@{username}</b> was sold on Fragment.\n\n{E_fragment} <b>found on Fragment:</b>\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","fragment_available":"{E_error} <b>@{username}</b> is taken.\n\n{E_fragment} <b>found on Fragment:</b>\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","fragment_unavailable":"{E_error} <b>@{username}</b> is taken or unavailable for assignment.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — not for sale.\n{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","price_line":"{E_coin} <b>price:</b> <code>{price}</code> GRAM\n","occupied":"{E_error} <b>@{username}</b> is taken or unavailable for assignment.","purchasable":"{E_coin} <b>@{username}</b> is only available as a collectible username.","fragment_error":"\n\n{E_error} <i>Fragment could not be checked temporarily.</i>","check_error":"{E_error} <b>Failed to check @{username} due to a Telegram error. Try again later.</b>","flood_wait_unknown":"{E_error} <b>@{username}</b> — <b>unknown</b>.","flood_wait_fragment_available":"{E_error} <b>@{username}</b> — <b>taken</b>.\n\n{E_fragment} <b>found on Fragment:</b>\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_sold":"{E_error} <b>@{username}</b> — <b>possibly taken</b>.\n\n{E_fragment} <b>Fragment:</b> username was sold.\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_unavailable":"{E_error} <b>@{username}</b> — <b>unknown</b>.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — not for sale.\n{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_note":"\n\n<b>{E_clock} FloodWait: {wait}.</b>\n<i>Because of the FloodWait it's impossible to know for sure whether the username is taken. But you can try to claim it by tapping the inline button below.</i>","prefix_bad":"<b>{E_error} prefix must contain only latin letters, digits and _ and be no longer than 31 characters.</b>","count_bad":"<b>{E_error} the check count must be a number from 1 to {maximum}.</b>","vfind_usage":"<b>{E_error} format: <code>.vufind</code>, <code>.vufind 100</code> or <code>.vufind user 100</code>.</b>","ai_evaluating":"<b>{E_robot} AI is analyzing @{username}...</b>","ai_result":"{body}","ai_no_key":"<b>{E_error} No API key set for AI evaluation.</b>\n\nGet key(s) at <code>aistudio.google.com</code> and set them via:\n<code>.config VUsername</code> → <code>ai_api_keys</code>\nYou can specify multiple keys separated by commas — this speeds things up and lowers the risk of hitting the quota.","ai_error_quota":"{E_error} {provider} API quota exceeded. Check your limits in the settings.","ai_error_quota_retry":"{E_error} {provider} API quota exceeded.\nTry again in about {seconds} sec.","ai_error_auth":"{E_error} <b>Invalid {provider} API key. Check your settings.</b>","ai_error_server":"{E_error} Temporary {provider} error. Try again later.","ai_error_model_not_found":"{E_error} Gemini model unavailable.\n\nCheck: <code>.config VUsername ai_model</code>\nRecommended: <code>gemini-3.5-flash</code>","ai_error_unknown":"{E_error} <b>{provider} error:</b> {error}","ai_error_both":"{E_error} <b>AI unavailable: both providers failed.</b>\n\n<b>Gemini:</b> {gemini_error}\n<b>Groq:</b> {groq_error}","ai_err_quota":"quota exceeded","ai_err_auth":"invalid API key","ai_err_server":"temporary server error","ai_err_network":"network error","ai_err_json":"invalid response format","ai_err_no_key":"no API key set","ai_err_model_not_found":"model unavailable","ai_err_unknown":"unknown error","ai_note_available":"{E_green} <b>Available</b>, not on Fragment — claim: <code>.vu {username}</code>\n","ai_note_taken_regular":"{E_lock} <b>The username is taken by a regular user, the estimate is theoretical.</b>\n","ai_comment_label":"Comments","find_running":"<b>{E_hourglass} a search is already running, please wait...</b>","find_stop_button":"⛔ Stop","find_stopping":"Stopping the search...","find_start":"<b>{E_search} searching for available usernames {mode}...\nchecked: 0 / {total}</b>","find_progress":"<b>{E_search} searching {mode}...\nchecked: {checked} / {total}\n\nfound: {found_count}\n{preview}</b>","find_nothing":"<b>{E_sad} no available usernames found {mode}.\nTry a different prefix or run it again.</b>","find_stopped":"<b>{E_stop} search stopped.\nChecked: {checked} / {total}.\nFound: {found_count}.</b>","find_flood":"<b>{E_clock} search stopped due to a Telegram limit.\nChecked: {checked} / {total}.\nFloodWait: {wait}.</b>","find_error":"<b>{E_error} search stopped due to a Telegram error.\nChecked: {checked} / {total}. Try again later.</b>","find_preview_empty":"nothing yet...","find_result":"{E_boom} <b>found available usernames {mode}:</b>\n\n{lines}\n\n<i>Page {page}/{pages} · found: {total_found}</i>\n\ntap to claim:","find_result_fallback":"{E_boom} <b>found available usernames {mode}:</b>\n\n{lines}{more_line}","find_more":"\n\n<i>Showing the first {shown} of {total_found} found; inline pagination unavailable.</i>","find_page_empty":"The list of found usernames is no longer available.","stop_ok":"<b>{E_stop} search stopped.</b>","stop_idle":"<b>ℹ️ no search is running.</b>","stop_idle_alert":"ℹ️ No search is running.","grab_busy":"Another claim is already in progress, try again.","grabbing":"claiming...","grab_success":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}","grab_success_avatar_failed":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}\n\n<i>Failed to set the avatar; the username is already assigned to the channel.</i>","grab_success_firstpost_failed":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}\n\n<i>Failed to send the first post; the username is already assigned to the channel.</i>","grab_success_avatar_firstpost_failed":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}\n\n<i>The username is assigned, but the avatar and first post could not be set.</i>","grab_taken":"The username is already taken. It may have been claimed right after the check.","grab_invalid":"Telegram rejected this username as invalid.","grab_purchasable":"This username is only available as a collectible.","grab_flood":"{E_clock} Telegram limited the operation. Try again in {wait}.","grab_public_limit":"The account's limit of public channels/usernames has been reached.","grab_channel_limit":"The account's channel creation limit has been reached.","grab_restricted":"Telegram has restricted channel creation for this account.","grab_bad_title":"The channel title in settings is empty or invalid.","grab_bad_about":"The channel description in settings is too long or invalid.","grab_no_rights":"Telegram did not allow modifying the created channel.","grab_error":"Failed to claim the username due to a Telegram error. Details were written to the log.","rollback_warning":"\n\n<b>{E_warning} Failed to automatically delete the temporary channel after the error. Check your channel list manually.</b>","grab_error_title":"{E_error} <b>Error:</b>\n<code>{error}</code>{rollback_warning}","mode_prefix":"by prefix <b>@{prefix}</b>","mode_random":"random (<b>{length} characters</b>)","ai_pros_label":"Pros","ai_cons_label":"Cons","ai_figure_label":"Known figure","upd_checking":"{E_search} <b>checking for updates...</b>","upd_downloading":"{E_search} <b>updating VUsername...</b>","upd_done":"{E_success} <b>VUsername updated successfully!</b>","upd_none":"{E_success} <b>you already have the latest version.</b>","upd_none_force":"{E_success} <b>you already have the latest version. Update anyway?</b>","upd_force_btn":"↻ update anyway","upd_cancel_btn":"✖ cancel","upd_fail":"{E_error} <b>update failed. Check the logs.</b>","upd_fetch_fail":"{E_error} <b>could not reach the update source. Try again later.</b>","upd_busy":"{E_error} <b>an update check/install is already running in the background. Try again in a bit.</b>",}
-    strings_ru={"name":"VUsername","_cls_doc":"Проверка юзернеймов, ИИ-оценка и поиск свободных через Fragment.","no_args":"<b>{E_error} укажи юзак!!</b>","bad_length":"<b>{E_error} юзернейм должен содержать от 4 до 32 символов!!</b>","bad_chars":"<b>{E_error} в юзернейме допустимы только латинские буквы, цифры и _ !!</b>","available":"юзак <b>@{username}</b> — свободен!!!\n\nхочешь занять этот юзернейм?","available_no_inline":"{E_boom} <b>@{username}</b> — свободен, но inline-форму создать не удалось. Повтори команду позже.","grab_button":"✔ занять","close_button":"✖ закрыть","checking":"<b>проверяю.. @{username}...</b>","fragment_sold":"{E_error} <b>@{username}</b> — продан на Fragment.\n\n{E_fragment} <b>найден на Fragment:</b>\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","fragment_available":"{E_error} <b>@{username}</b> — занят.\n\n{E_fragment} <b>найден на Fragment:</b>\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","fragment_unavailable":"{E_error} <b>@{username}</b> — занят или недоступен для назначения.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — не продаётся.\n{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","price_line":"{E_coin} <b>цена:</b> <code>{price}</code> GRAM\n","occupied":"{E_error} <b>@{username}</b> — занят или недоступен для назначения.","purchasable":"{E_coin} <b>@{username}</b> доступен только как коллекционный юзернейм.","fragment_error":"\n\n{E_error} <i>Fragment временно не удалось проверить.</i>","check_error":"{E_error} <b>Не удалось проверить @{username} из-за ошибки Telegram. Попробуй позже.</b>","flood_wait_unknown":"{E_error} <b>@{username}</b> — <b>неизвестно</b>.","flood_wait_fragment_available":"{E_error} <b>@{username}</b> — <b>занят</b>.\n\n{E_fragment} <b>найден на Fragment:</b>\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_sold":"{E_error} <b>@{username}</b> — <b>Возможно, занят</b>.\n\n{E_fragment} <b>Fragment:</b> юзернейм продан.\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_unavailable":"{E_error} <b>@{username}</b> — <b>неизвестно</b>.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — не продаётся.\n{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_note":"\n\n<b>{E_clock} FloodWait: {wait}.</b>\n<i>Из-за FloodWait точно проверить, занят ли юзернейм, невозможно. Но вы можете попробовать занять его, нажав на inline-кнопку ниже.</i>","prefix_bad":"<b>{E_error} префикс должен содержать только латинские буквы, цифры и _ и быть не длиннее 31 символа.</b>","count_bad":"<b>{E_error} количество проверок должно быть числом от 1 до {maximum}.</b>","vfind_usage":"<b>{E_error} формат: <code>.vufind</code>, <code>.vufind 100</code> или <code>.vufind user 100</code>.</b>","ai_evaluating":"<b>{E_robot} ИИ анализирует @{username}...</b>","ai_result":"{body}","ai_no_key":"<b>{E_error} Не задан API-ключ для ИИ-оценки.</b>\n\nПолучи ключ(и) на <code>aistudio.google.com</code> и укажи их командой:\n<code>.config VUsername</code> → <code>ai_api_keys</code>\nМожно указать несколько ключей через запятую — это ускоряет работу и снижает риск упереться в квоту.","ai_error_quota":"{E_error} Превышена квота {provider} API. Проверьте лимиты в настройках.","ai_error_quota_retry":"{E_error} Превышена квота {provider} API.\nПовторите запрос примерно через {seconds} сек.","ai_error_auth":"{E_error} <b>Неверный API-ключ {provider}. Проверьте настройки.</b>","ai_error_server":"{E_error} Временная ошибка {provider}. Попробуйте позже.","ai_error_model_not_found":"{E_error} Модель Gemini недоступна.\n\nПроверьте: <code>.config VUsername ai_model</code>\nРекомендуется: <code>gemini-3.5-flash</code>","ai_error_unknown":"{E_error} <b>Ошибка {provider}:</b> {error}","ai_error_both":"{E_error} <b>ИИ недоступен: оба провайдера не сработали.</b>\n\n<b>Gemini:</b> {gemini_error}\n<b>Groq:</b> {groq_error}","ai_err_quota":"превышена квота","ai_err_auth":"неверный API-ключ","ai_err_server":"временная ошибка сервера","ai_err_network":"ошибка сети","ai_err_json":"некорректный формат ответа","ai_err_no_key":"не задан API-ключ","ai_err_model_not_found":"модель недоступна","ai_err_unknown":"неизвестная ошибка","ai_note_available":"{E_green} <b>Свободен</b>, не продаётся на Fragment — занять: <code>.vu {username}</code>\n","ai_note_taken_regular":"{E_lock} <b>Юзернейм занят обычным пользователем, оценка теоретическая.</b>\n","ai_comment_label":"Комментарии","find_running":"<b>{E_hourglass} уже идёт поиск, подожди...</b>","find_stop_button":"⛔ Стоп","find_stopping":"Останавливаю поиск...","find_start":"<b>{E_search} ищу свободные юзернеймы {mode}...\nпроверено: 0 / {total}</b>","find_progress":"<b>{E_search} ищу {mode}...\nпроверено: {checked} / {total}\n\nнайдено: {found_count}\n{preview}</b>","find_nothing":"<b>{E_sad} свободных юзернеймов {mode} не найдено.\nПопробуй другой префикс или запусти снова.</b>","find_stopped":"<b>{E_stop} поиск остановлен.\nПроверено: {checked} / {total}.\nНайдено: {found_count}.</b>","find_flood":"<b>{E_clock} поиск остановлен из-за ограничения Telegram.\nПроверено: {checked} / {total}.\nFloodWait: {wait}.</b>","find_error":"<b>{E_error} поиск остановлен из-за ошибки Telegram.\nПроверено: {checked} / {total}. Попробуй позже.</b>","find_preview_empty":"пока ничего...","find_result":"{E_boom} <b>найдены свободные юзернеймы {mode}:</b>\n\n{lines}\n\n<i>Страница {page}/{pages} · найдено: {total_found}</i>\n\nнажми чтобы занять:","find_result_fallback":"{E_boom} <b>найдены свободные юзернеймы {mode}:</b>\n\n{lines}{more_line}","find_more":"\n\n<i>Показаны первые {shown} из {total_found} найденных; inline-пагинация недоступна.</i>","find_page_empty":"Список найденных юзернеймов уже недоступен.","stop_ok":"<b>{E_stop} поиск остановлен.</b>","stop_idle":"<b>ℹ️ поиск не запущен.</b>","stop_idle_alert":"ℹ️ Поиск не запущен.","grab_busy":"Уже выполняется другой захват, попробуй ещё раз.","grabbing":"захватываю...","grab_success":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}","grab_success_avatar_failed":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}\n\n<i>Аватар установить не удалось; юзернейм уже закреплён за каналом.</i>","grab_success_firstpost_failed":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}\n\n<i>Первый пост отправить не удалось; юзернейм уже закреплён за каналом.</i>","grab_success_avatar_firstpost_failed":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}\n\n<i>Юзернейм закреплён, но аватар установить и первый пост отправить не удалось.</i>","grab_taken":"Юзернейм уже занят. Возможно, его успели забрать после проверки.","grab_invalid":"Telegram отклонил этот юзернейм как недопустимый.","grab_purchasable":"Этот юзернейм доступен только как коллекционный.","grab_flood":"{E_clock} Telegram ограничил операцию. Повтори через {wait}.","grab_public_limit":"Достигнут лимит публичных каналов/юзернеймов аккаунта.","grab_channel_limit":"Достигнут лимит создаваемых каналов аккаунта.","grab_restricted":"Telegram ограничил создание каналов для этого аккаунта.","grab_bad_title":"Название канала в настройках пустое или недопустимое.","grab_bad_about":"Описание канала в настройках слишком длинное или недопустимое.","grab_no_rights":"Telegram не разрешил изменить созданный канал.","grab_error":"Не удалось занять юзернейм из-за ошибки Telegram. Подробности записаны в лог.","rollback_warning":"\n\n<b>{E_warning} Не удалось автоматически удалить временный канал после ошибки. Проверь список своих каналов вручную.</b>","grab_error_title":"{E_error} <b>Ошибка:</b>\n<code>{error}</code>{rollback_warning}","mode_prefix":"по префиксу <b>@{prefix}</b>","mode_random":"случайные (<b>{length} символов</b>)","ai_pros_label":"Преимущества","ai_cons_label":"Недостатки","ai_figure_label":"Известная личность","upd_checking":"{E_search} <b>проверяю обновления...</b>","upd_downloading":"{E_search} <b>обновляю VUsername...</b>","upd_done":"{E_success} <b>VUsername успешно обновлён!</b>","upd_none":"{E_success} <b>у тебя уже последняя версия.</b>","upd_none_force":"{E_success} <b>у тебя уже последняя версия. Обновить всё равно?</b>","upd_force_btn":"↻ обновить всё равно","upd_cancel_btn":"✖ отмена","upd_fail":"{E_error} <b>обновление не удалось. Смотри логи.</b>","upd_fetch_fail":"{E_error} <b>не удалось достучаться до источника обновления. Попробуй позже.</b>","upd_busy":"{E_error} <b>проверка/установка обновления уже выполняется в фоне. Попробуй чуть позже.</b>",}
+    strings={"name":"VUsername","no_args":"<b>{E_error} specify a username!!</b>","bad_length":"<b>{E_error} username must be 4 to 32 characters long!!</b>","bad_chars":"<b>{E_error} only latin letters, digits and _ are allowed in the username!!</b>","available":"username <b>@{username}</b> is available!!!\n\nwant to claim this username?","available_no_inline":"{E_boom} <b>@{username}</b> is available, but the inline form could not be created. Try the command again later.","grab_button":"✔ claim","close_button":"✖ close","checking":"<b>checking.. @{username}...</b>","fragment_sold":"{E_error} <b>@{username}</b> was sold on Fragment.\n\n{E_fragment} <b>found on Fragment:</b>\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","fragment_available":"{E_error} <b>@{username}</b> is taken.\n\n{E_fragment} <b>found on Fragment:</b>\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","fragment_unavailable":"{E_error} <b>@{username}</b> is taken or unavailable for assignment.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — not for sale.\n{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","price_line":"{E_coin} <b>price:</b> <code>{price}</code> GRAM\n","occupied":"{E_error} <b>@{username}</b> is taken or unavailable for assignment.","purchasable":"{E_coin} <b>@{username}</b> is only available as a collectible username.","fragment_error":"\n\n{E_error} <i>Fragment could not be checked temporarily.</i>","check_error":"{E_error} <b>Failed to check @{username} due to a Telegram error. Try again later.</b>","flood_wait_unknown":"{E_error} <b>@{username}</b> — <b>unknown</b>.","flood_wait_fragment_available":"{E_error} <b>@{username}</b> — <b>taken</b>.\n\n{E_fragment} <b>found on Fragment:</b>\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_sold":"{E_error} <b>@{username}</b> — <b>possibly taken</b>.\n\n{E_fragment} <b>Fragment:</b> username was sold.\n{price_line}{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_unavailable":"{E_error} <b>@{username}</b> — <b>unknown</b>.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — not for sale.\n{E_link} <b>link:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_note":"\n\n<b>{E_clock} FloodWait: {wait}.</b>\n<i>Because of the FloodWait it's impossible to know for sure whether the username is taken. But you can try to claim it by tapping the inline button below.</i>","prefix_bad":"<b>{E_error} prefix must contain only latin letters, digits and _ and be no longer than 31 characters.</b>","count_bad":"<b>{E_error} the check count must be a number from 1 to {maximum}.</b>","vfind_usage":"<b>{E_error} format: <code>.vufind</code>, <code>.vufind 100</code> or <code>.vufind user 100</code>.</b>","ai_evaluating":"<b>{E_robot} AI is analyzing @{username}...</b>","ai_result":"{body}","ai_no_key":"<b>{E_error} No API key set for AI evaluation.</b>\n\nGet key(s) at <code>aistudio.google.com</code> and set them via:\n<code>.config VUsername</code> → <code>ai_api_keys</code>\nYou can specify multiple keys separated by commas — this speeds things up and lowers the risk of hitting the quota.","ai_error_quota":"{E_error} {provider} API quota exceeded. Check your limits in the settings.","ai_error_quota_retry":"{E_error} {provider} API quota exceeded.\nTry again in about {seconds} sec.","ai_error_auth":"{E_error} <b>Invalid {provider} API key. Check your settings.</b>","ai_error_server":"{E_error} Temporary {provider} error. Try again later.","ai_error_model_not_found":"{E_error} Gemini model unavailable.\n\nCheck: <code>.config VUsername ai_model</code>\nRecommended: <code>gemini-3.5-flash</code>","ai_error_unknown":"{E_error} <b>{provider} error:</b> {error}","ai_error_both":"{E_error} <b>AI unavailable: both providers failed.</b>\n\n<b>Gemini:</b> {gemini_error}\n<b>Groq:</b> {groq_error}","ai_err_quota":"quota exceeded","ai_err_auth":"invalid API key","ai_err_server":"temporary server error","ai_err_network":"network error","ai_err_json":"invalid response format","ai_err_no_key":"no API key set","ai_err_model_not_found":"model unavailable","ai_err_unknown":"unknown error","ai_note_available":"{E_green} <b>Available</b>, not on Fragment — claim: <code>.vu {username}</code>\n","ai_note_taken_regular":"{E_lock} <b>The username is taken by a regular user, the estimate is theoretical.</b>\n","ai_comment_label":"Comments","find_running":"<b>{E_hourglass} a search is already running, please wait...</b>","find_stop_button":"⛔ Stop","find_stopping":"Stopping the search...","find_start":"<b>{E_search} searching for available usernames {mode}...\nchecked: 0 / {total}</b>","find_progress":"<b>{E_search} searching {mode}...\nchecked: {checked} / {total}\n\nfound: {found_count}\n{preview}</b>","find_nothing":"<b>{E_sad} no available usernames found {mode}.\nTry a different prefix or run it again.</b>","find_stopped":"<b>{E_stop} search stopped.\nChecked: {checked} / {total}.\nFound: {found_count}.</b>","find_flood":"<b>{E_clock} search stopped due to a Telegram limit.\nChecked: {checked} / {total}.\nFloodWait: {wait}.</b>","find_error":"<b>{E_error} search stopped due to a Telegram error.\nChecked: {checked} / {total}. Try again later.</b>","find_preview_empty":"nothing yet...","find_price_hint":" ~<code>{price}</code> GRAM (~${usd})","find_result":"{E_boom} <b>found available usernames {mode}:</b>\n\n{lines}\n\n<i>Page {page}/{pages} · found: {total_found}</i>\n\ntap to claim:","find_result_fallback":"{E_boom} <b>found available usernames {mode}:</b>\n\n{lines}{more_line}","find_more":"\n\n<i>Showing the first {shown} of {total_found} found; inline pagination unavailable.</i>","find_page_empty":"The list of found usernames is no longer available.","stop_ok":"<b>{E_stop} search stopped.</b>","stop_idle":"<b>ℹ️ no search is running.</b>","stop_idle_alert":"ℹ️ No search is running.","grab_busy":"Another claim is already in progress, try again.","grabbing":"claiming...","grab_success":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}","grab_success_avatar_failed":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}\n\n<i>Failed to set the avatar; the username is already assigned to the channel.</i>","grab_success_firstpost_failed":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}\n\n<i>Failed to send the first post; the username is already assigned to the channel.</i>","grab_success_avatar_firstpost_failed":"{E_boom} <b>@{username}</b> claimed successfully!\n\nChannel: {channel}\n\n<i>The username is assigned, but the avatar and first post could not be set.</i>","grab_taken":"The username is already taken. It may have been claimed right after the check.","grab_invalid":"Telegram rejected this username as invalid.","grab_purchasable":"This username is only available as a collectible.","grab_flood":"{E_clock} Telegram limited the operation. Try again in {wait}.","grab_public_limit":"The account's limit of public channels/usernames has been reached.","grab_channel_limit":"The account's channel creation limit has been reached.","grab_restricted":"Telegram has restricted channel creation for this account.","grab_bad_title":"The channel title in settings is empty or invalid.","grab_bad_about":"The channel description in settings is too long or invalid.","grab_no_rights":"Telegram did not allow modifying the created channel.","grab_error":"Failed to claim the username due to a Telegram error. Details were written to the log.","rollback_warning":"\n\n<b>{E_warning} Failed to automatically delete the temporary channel after the error. Check your channel list manually.</b>","grab_error_title":"{E_error} <b>Error:</b>\n<code>{error}</code>{rollback_warning}","mode_prefix":"by prefix <b>@{prefix}</b>","mode_random":"random (<b>{length} characters</b>)","ai_pros_label":"Pros","ai_cons_label":"Cons","ai_figure_label":"Known figure","upd_checking":"{E_search} <b>checking for updates...</b>","upd_downloading":"{E_search} <b>updating VUsername...</b>","upd_done":"{E_success} <b>VUsername updated successfully!</b>","upd_none":"{E_success} <b>you already have the latest version.</b>","upd_none_force":"{E_success} <b>you already have the latest version. Update anyway?</b>","upd_force_btn":"↻ update anyway","upd_cancel_btn":"✖ cancel","upd_fail":"{E_error} <b>update failed. Check the logs.</b>","upd_fetch_fail":"{E_error} <b>could not reach the update source. Try again later.</b>","upd_busy":"{E_error} <b>an update check/install is already running in the background. Try again in a bit.</b>",}
+    strings_ru={"name":"VUsername","_cls_doc":"Проверка юзернеймов, ИИ-оценка и поиск свободных через Fragment.","no_args":"<b>{E_error} укажи юзак!!</b>","bad_length":"<b>{E_error} юзернейм должен содержать от 4 до 32 символов!!</b>","bad_chars":"<b>{E_error} в юзернейме допустимы только латинские буквы, цифры и _ !!</b>","available":"юзак <b>@{username}</b> — свободен!!!\n\nхочешь занять этот юзернейм?","available_no_inline":"{E_boom} <b>@{username}</b> — свободен, но inline-форму создать не удалось. Повтори команду позже.","grab_button":"✔ занять","close_button":"✖ закрыть","checking":"<b>проверяю.. @{username}...</b>","fragment_sold":"{E_error} <b>@{username}</b> — продан на Fragment.\n\n{E_fragment} <b>найден на Fragment:</b>\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","fragment_available":"{E_error} <b>@{username}</b> — занят.\n\n{E_fragment} <b>найден на Fragment:</b>\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","fragment_unavailable":"{E_error} <b>@{username}</b> — занят или недоступен для назначения.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — не продаётся.\n{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","price_line":"{E_coin} <b>цена:</b> <code>{price}</code> GRAM\n","occupied":"{E_error} <b>@{username}</b> — занят или недоступен для назначения.","purchasable":"{E_coin} <b>@{username}</b> доступен только как коллекционный юзернейм.","fragment_error":"\n\n{E_error} <i>Fragment временно не удалось проверить.</i>","check_error":"{E_error} <b>Не удалось проверить @{username} из-за ошибки Telegram. Попробуй позже.</b>","flood_wait_unknown":"{E_error} <b>@{username}</b> — <b>неизвестно</b>.","flood_wait_fragment_available":"{E_error} <b>@{username}</b> — <b>занят</b>.\n\n{E_fragment} <b>найден на Fragment:</b>\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_sold":"{E_error} <b>@{username}</b> — <b>Возможно, занят</b>.\n\n{E_fragment} <b>Fragment:</b> юзернейм продан.\n{price_line}{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_unavailable":"{E_error} <b>@{username}</b> — <b>неизвестно</b>.\n\n{E_fragment} <b>Fragment:</b> <code>Unavailable</code> — не продаётся.\n{E_link} <b>ссылка:</b> <a href=\"{url}\">{url}</a>","flood_wait_fragment_note":"\n\n<b>{E_clock} FloodWait: {wait}.</b>\n<i>Из-за FloodWait точно проверить, занят ли юзернейм, невозможно. Но вы можете попробовать занять его, нажав на inline-кнопку ниже.</i>","prefix_bad":"<b>{E_error} префикс должен содержать только латинские буквы, цифры и _ и быть не длиннее 31 символа.</b>","count_bad":"<b>{E_error} количество проверок должно быть числом от 1 до {maximum}.</b>","vfind_usage":"<b>{E_error} формат: <code>.vufind</code>, <code>.vufind 100</code> или <code>.vufind user 100</code>.</b>","ai_evaluating":"<b>{E_robot} ИИ анализирует @{username}...</b>","ai_result":"{body}","ai_no_key":"<b>{E_error} Не задан API-ключ для ИИ-оценки.</b>\n\nПолучи ключ(и) на <code>aistudio.google.com</code> и укажи их командой:\n<code>.config VUsername</code> → <code>ai_api_keys</code>\nМожно указать несколько ключей через запятую — это ускоряет работу и снижает риск упереться в квоту.","ai_error_quota":"{E_error} Превышена квота {provider} API. Проверьте лимиты в настройках.","ai_error_quota_retry":"{E_error} Превышена квота {provider} API.\nПовторите запрос примерно через {seconds} сек.","ai_error_auth":"{E_error} <b>Неверный API-ключ {provider}. Проверьте настройки.</b>","ai_error_server":"{E_error} Временная ошибка {provider}. Попробуйте позже.","ai_error_model_not_found":"{E_error} Модель Gemini недоступна.\n\nПроверьте: <code>.config VUsername ai_model</code>\nРекомендуется: <code>gemini-3.5-flash</code>","ai_error_unknown":"{E_error} <b>Ошибка {provider}:</b> {error}","ai_error_both":"{E_error} <b>ИИ недоступен: оба провайдера не сработали.</b>\n\n<b>Gemini:</b> {gemini_error}\n<b>Groq:</b> {groq_error}","ai_err_quota":"превышена квота","ai_err_auth":"неверный API-ключ","ai_err_server":"временная ошибка сервера","ai_err_network":"ошибка сети","ai_err_json":"некорректный формат ответа","ai_err_no_key":"не задан API-ключ","ai_err_model_not_found":"модель недоступна","ai_err_unknown":"неизвестная ошибка","ai_note_available":"{E_green} <b>Свободен</b>, не продаётся на Fragment — занять: <code>.vu {username}</code>\n","ai_note_taken_regular":"{E_lock} <b>Юзернейм занят обычным пользователем, оценка теоретическая.</b>\n","ai_comment_label":"Комментарии","find_running":"<b>{E_hourglass} уже идёт поиск, подожди...</b>","find_stop_button":"⛔ Стоп","find_stopping":"Останавливаю поиск...","find_start":"<b>{E_search} ищу свободные юзернеймы {mode}...\nпроверено: 0 / {total}</b>","find_progress":"<b>{E_search} ищу {mode}...\nпроверено: {checked} / {total}\n\nнайдено: {found_count}\n{preview}</b>","find_nothing":"<b>{E_sad} свободных юзернеймов {mode} не найдено.\nПопробуй другой префикс или запусти снова.</b>","find_stopped":"<b>{E_stop} поиск остановлен.\nПроверено: {checked} / {total}.\nНайдено: {found_count}.</b>","find_flood":"<b>{E_clock} поиск остановлен из-за ограничения Telegram.\nПроверено: {checked} / {total}.\nFloodWait: {wait}.</b>","find_error":"<b>{E_error} поиск остановлен из-за ошибки Telegram.\nПроверено: {checked} / {total}. Попробуй позже.</b>","find_preview_empty":"пока ничего...","find_price_hint":" ~<code>{price}</code> GRAM (~${usd})","find_result":"{E_boom} <b>найдены свободные юзернеймы {mode}:</b>\n\n{lines}\n\n<i>Страница {page}/{pages} · найдено: {total_found}</i>\n\nнажми чтобы занять:","find_result_fallback":"{E_boom} <b>найдены свободные юзернеймы {mode}:</b>\n\n{lines}{more_line}","find_more":"\n\n<i>Показаны первые {shown} из {total_found} найденных; inline-пагинация недоступна.</i>","find_page_empty":"Список найденных юзернеймов уже недоступен.","stop_ok":"<b>{E_stop} поиск остановлен.</b>","stop_idle":"<b>ℹ️ поиск не запущен.</b>","stop_idle_alert":"ℹ️ Поиск не запущен.","grab_busy":"Уже выполняется другой захват, попробуй ещё раз.","grabbing":"захватываю...","grab_success":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}","grab_success_avatar_failed":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}\n\n<i>Аватар установить не удалось; юзернейм уже закреплён за каналом.</i>","grab_success_firstpost_failed":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}\n\n<i>Первый пост отправить не удалось; юзернейм уже закреплён за каналом.</i>","grab_success_avatar_firstpost_failed":"{E_boom} <b>@{username}</b> успешно занят!\n\nКанал: {channel}\n\n<i>Юзернейм закреплён, но аватар установить и первый пост отправить не удалось.</i>","grab_taken":"Юзернейм уже занят. Возможно, его успели забрать после проверки.","grab_invalid":"Telegram отклонил этот юзернейм как недопустимый.","grab_purchasable":"Этот юзернейм доступен только как коллекционный.","grab_flood":"{E_clock} Telegram ограничил операцию. Повтори через {wait}.","grab_public_limit":"Достигнут лимит публичных каналов/юзернеймов аккаунта.","grab_channel_limit":"Достигнут лимит создаваемых каналов аккаунта.","grab_restricted":"Telegram ограничил создание каналов для этого аккаунта.","grab_bad_title":"Название канала в настройках пустое или недопустимое.","grab_bad_about":"Описание канала в настройках слишком длинное или недопустимое.","grab_no_rights":"Telegram не разрешил изменить созданный канал.","grab_error":"Не удалось занять юзернейм из-за ошибки Telegram. Подробности записаны в лог.","rollback_warning":"\n\n<b>{E_warning} Не удалось автоматически удалить временный канал после ошибки. Проверь список своих каналов вручную.</b>","grab_error_title":"{E_error} <b>Ошибка:</b>\n<code>{error}</code>{rollback_warning}","mode_prefix":"по префиксу <b>@{prefix}</b>","mode_random":"случайные (<b>{length} символов</b>)","ai_pros_label":"Преимущества","ai_cons_label":"Недостатки","ai_figure_label":"Известная личность","upd_checking":"{E_search} <b>проверяю обновления...</b>","upd_downloading":"{E_search} <b>обновляю VUsername...</b>","upd_done":"{E_success} <b>VUsername успешно обновлён!</b>","upd_none":"{E_success} <b>у тебя уже последняя версия.</b>","upd_none_force":"{E_success} <b>у тебя уже последняя версия. Обновить всё равно?</b>","upd_force_btn":"↻ обновить всё равно","upd_cancel_btn":"✖ отмена","upd_fail":"{E_error} <b>обновление не удалось. Смотри логи.</b>","upd_fetch_fail":"{E_error} <b>не удалось достучаться до источника обновления. Попробуй позже.</b>","upd_busy":"{E_error} <b>проверка/установка обновления уже выполняется в фоне. Попробуй чуть позже.</b>",}
     for _dict in(strings,strings_ru):
         for _key,_val in list(_dict.items()):
             if isinstance(_val,str)and"{E_"in _val:
@@ -87,7 +87,12 @@ class VUsernameMod(loader.Module):
     FRAGMENT_CACHE_MAX_ENTRIES=500
     SIMILAR_CACHE_TTL=300.0
     SIMILAR_CACHE_MAX_ENTRIES=300
-    SIMILAR_LISTINGS_LIMIT=10
+    SIMILAR_LISTINGS_LIMIT=25
+    SIMILAR_LISTINGS_MIN_TARGET=8
+    SIMILAR_QUERY_MIN_LEN=4
+    SIMILAR_QUERY_MAX_QUERIES=2
+    SIMILAR_LENGTH_WINDOW=2
+    SIMILAR_PRICE_MIN_SAMPLES=2
     AI_TIMEOUT=(5,40)
     AI_CACHE_TTL=90.0
     TON_USD_RATE=1.322
@@ -339,25 +344,21 @@ class VUsernameMod(loader.Module):
                 for k in expired:self._fragment_cache.pop(k,None)
         return status,price,offers
 
-    async def _fetch_similar_listings_async(self,username:str):
-        """Looks up similar usernames on Fragment via the search page (fragment.com/?query=...) —
-        e.g. for 'hacker' that's hacker2, hacker3, hackerd, etc. — along with their status
-        (available/taken) and price. These are real market reference points for usernames
-        of a similar structure/theme, which help the AI calibrate the price more precisely
-        when there is no direct sale data for the requested username itself."""
-        url=f"https://fragment.com/?query={username}"
+    async def _fetch_similar_listings_for_query(self,query,exclude_lower,seen):
+        """Runs a single Fragment search query and returns the (candidate, status, price)
+        listings found in it that aren't the excluded username and weren't already seen
+        in a previous query (seen is shared and mutated across queries for one lookup)."""
+        url=f"https://fragment.com/?query={query}"
         status_code,content=await self._request_with_retry(url,max_retries=self.MAX_RETRIES_FRAGMENT)
         if status_code!=200 or content is None or isinstance(content,dict):
             return[]
         try:
             soup=BeautifulSoup(content,"html.parser")
         except Exception:
-            logger.exception("Failed to parse Fragment search HTML for @%s",username)
+            logger.exception("Failed to parse Fragment search HTML for query=%s",query)
             return[]
-        username_lower=username.lower()
         name_re=re.compile(r"@([A-Za-z0-9_]{4,32})")
         results=[]
-        seen={username_lower}
         for row in soup.select("tr, .tm-row-selectable, .tm-table-row, .table-row, .tm-row"):
             row_text=" ".join(row.get_text(" ",strip=True).split())
             if not row_text:continue
@@ -365,7 +366,7 @@ class VUsernameMod(loader.Module):
             if not match:continue
             candidate=match.group(1)
             candidate_lower=candidate.lower()
-            if candidate_lower in seen:continue
+            if candidate_lower==exclude_lower or candidate_lower in seen:continue
             lowered=row_text.lower()
             if"taken"in lowered:
                 status_label="taken"
@@ -385,9 +386,57 @@ class VUsernameMod(loader.Module):
                 if price is None:
                     price=self._parse_amount(row_text)
             results.append((candidate,status_label,price))
-            if len(results)>=self.SIMILAR_LISTINGS_LIMIT*2:break
-        if results:logger.info("Fragment search[@%s]: similar listings found=%d",username,len(results))
-        return results[:self.SIMILAR_LISTINGS_LIMIT*2]
+            if len(results)>=self.SIMILAR_LISTINGS_LIMIT:break
+        return results
+
+    def _similar_search_queries(self,username):
+        """Builds a short list of Fragment search queries to widen the pool of similar
+        usernames beyond a single exact match: the full username first, then — at most
+        SIMILAR_QUERY_MAX_QUERIES-1 times — a shorter prefix of it (never below
+        SIMILAR_QUERY_MIN_LEN chars). Kept intentionally shallow: trimming too many
+        characters turns the query generic and starts matching unrelated, differently
+        priced usernames on Fragment (results are also length-filtered afterwards to
+        guard against this)."""
+        username_lower=username.lower()
+        queries=[username_lower]
+        length=len(username_lower)
+        cur=length
+        while len(queries)<self.SIMILAR_QUERY_MAX_QUERIES and cur>self.SIMILAR_QUERY_MIN_LEN:
+            cur-=1
+            prefix=username_lower[:cur]
+            if len(prefix)>=self.SIMILAR_QUERY_MIN_LEN and prefix not in queries:
+                queries.append(prefix)
+        return queries
+
+    async def _fetch_similar_listings_async(self,username:str):
+        """Looks up similar usernames on Fragment: starts with an exact search for the
+        username itself, then — if that alone didn't turn up enough priced comparables —
+        keeps trying progressively shorter prefixes of it, merging and deduplicating
+        results across queries. Stops early once enough priced listings have been
+        collected (SIMILAR_LISTINGS_MIN_TARGET) or the query list is exhausted. These are
+        real market reference points for usernames of a similar structure/theme, which
+        help the AI (and the .vufind price hints) calibrate the price more precisely when
+        there's little or no direct sale data for the requested username itself."""
+        username_lower=username.lower()
+        base_len=len(username_lower)
+        seen={username_lower}
+        all_results=[]
+        for query in self._similar_search_queries(username):
+            try:
+                chunk=await self._fetch_similar_listings_for_query(query,username_lower,seen)
+            except Exception:
+                logger.exception("Failed to fetch Fragment search results for query=%s",query)
+                continue
+
+
+
+            chunk=[item for item in chunk if abs(len(item[0])-base_len)<=self.SIMILAR_LENGTH_WINDOW]
+            all_results.extend(chunk)
+            priced_count=sum(1 for _,s,p in all_results if s=="available"and isinstance(p,(int,float))and p>0)
+            if priced_count>=self.SIMILAR_LISTINGS_MIN_TARGET or len(all_results)>=self.SIMILAR_LISTINGS_LIMIT:
+                break
+        if all_results:logger.info("Fragment search[@%s]: similar listings found=%d (queries used=%d)",username,len(all_results),len(seen))
+        return all_results[:self.SIMILAR_LISTINGS_LIMIT]
 
     async def _fetch_similar_listings(self,username):
         key=username.lower()
@@ -403,6 +452,49 @@ class VUsernameMod(loader.Module):
                 expired=[k for k,(ts,_)in self._similar_cache.items()if now-ts>=self.SIMILAR_CACHE_TTL]
                 for k in expired:self._similar_cache.pop(k,None)
         return listings
+
+    async def _find_price_hint_raw(self,username):
+        """Returns (avg_price_gram, avg_price_usd) from similar Fragment listings for this
+        username, or None if there wasn't enough priced data to trust. Reuses the same
+        cached lookup as the AI valuation (_fetch_similar_listings), so this doesn't add
+        extra requests if the username was already checked with .vuai."""
+        try:
+            similar_listings=await self._fetch_similar_listings(username)
+        except Exception:
+            logger.exception("Failed to fetch similar Fragment listings for @%s",username)
+            return None
+        similar_priced=sorted(p for _,s,p in similar_listings if s=="available"and isinstance(p,(int,float))and p>0)
+
+
+
+        if len(similar_priced)<self.SIMILAR_PRICE_MIN_SAMPLES:return None
+        n=len(similar_priced)
+        median_price=similar_priced[n//2]if n%2 else(similar_priced[n//2-1]+similar_priced[n//2])/2
+
+
+        filtered=[p for p in similar_priced if p<=median_price*3]or similar_priced
+        avg_price=sum(filtered)/len(filtered)
+        try:avg_usd=round(avg_price*self.TON_USD_RATE)
+        except(TypeError,ValueError):avg_usd=None
+        return avg_price,avg_usd
+
+    async def _fetch_price_hints(self,usernames):
+        """Concurrently looks up a short price hint (based on similar Fragment listings)
+        for each of the given usernames and returns {username: rendered_hint_str}. If no
+        similar priced listings were found for a username, the hint shows 0$ rather than
+        being omitted."""
+        usernames=list(dict.fromkeys(usernames))
+        if not usernames:return{}
+        sem=asyncio.Semaphore(5)
+        async def _one(username):
+            async with sem:
+                return username,await self._find_price_hint_raw(username)
+        results=await asyncio.gather(*(_one(u)for u in usernames),return_exceptions=False)
+        hints={}
+        for username,result in results:
+            avg_price,avg_usd=result if result else(0,0)
+            hints[username]=self.strings["find_price_hint"].format(price=f"{avg_price:,.0f}",usd=avg_usd if avg_usd is not None else 0)
+        return hints
 
     def _build_ai_prompt(self,username,fragment_status,price,offers=None,similar_listings=None):
         is_ru=self._is_ru()
@@ -690,7 +782,6 @@ class VUsernameMod(loader.Module):
         is_ru=self._is_ru()
         lines=[]
         fragment_url=f"https://fragment.com/username/{username}"
-        show_link=(bool(price)and fragment_status in(FragmentStatus.SOLD,FragmentStatus.AVAILABLE))or is_taken
         if fragment_status is FragmentStatus.SOLD and price:
             label=f"<b>Продан на Fragment | Цена: {esc(price)} GRAM</b>"if is_ru else f"<b>Sold on Fragment | Price: {esc(price)} GRAM</b>"
             lines.append(f"{self._emoji('stats')} {self._emoji('success')} {label}")
@@ -856,7 +947,7 @@ class VUsernameMod(loader.Module):
             lines.append(f"<i>{self._emoji('chart')} <b>@{esc(username)}</b> — {esc(price)} GRAM (~${fmt_price(comparable_usd)})</i>")
         else:
             lines.append(f"<i>{self._emoji('chart')} <b>@{esc(username)}</b> — {price_range}</i>")
-        link_part=f" | {self._emoji('link')} <a href=\"{fragment_url}\">{'Ссылка'if is_ru else'Link'}</a>"if show_link else""
+        link_part=f" | {self._emoji('link')} <a href=\"{fragment_url}\">{'Ссылка'if is_ru else'Link'}</a>"
         lines.append(f"<i>{self._emoji('robot')} {esc(model)if model else'—'} | {self._emoji('trophy')} {rank_int}/10 | {self._emoji('star')} {potential_int}/5{link_part}</i>")
         if pros:
             pros_text="\n".join(f"{i}. {esc(p)}"for i,p in enumerate(pros,1))
@@ -1565,7 +1656,7 @@ class VUsernameMod(loader.Module):
     async def _finish_find_results(self,status_message,message,found,mode_text,inline_status):
         found_count=len(found)
         found_tuple=tuple(found)
-        page_text,page_buttons=self._build_find_page(found_tuple,0,mode_text)
+        page_text,page_buttons=await self._build_find_page(found_tuple,0,mode_text)
         if inline_status and status_message is not None:
             try:
                 await status_message.edit(text=plain_emoji(page_text),reply_markup=page_buttons)
@@ -1578,7 +1669,8 @@ class VUsernameMod(loader.Module):
                 except Exception as e:logger.debug("Failed to delete the progress message after the search: %s",e)
             return
         fallback_items=found[:self.FALLBACK_DISPLAY_FOUND]
-        fallback_lines="\n".join(f"• <code>@{html.escape(username)}</code>"for username in fallback_items)
+        fallback_price_hints=await self._fetch_price_hints(fallback_items)
+        fallback_lines="\n".join(f"• <code>@{html.escape(username)}</code>{fallback_price_hints.get(username,'')}"for username in fallback_items)
         more_line=self.strings["find_more"].format(shown=len(fallback_items),total_found=found_count)if found_count>len(fallback_items)else""
         await self._edit_status(status_message,message,self.strings["find_result_fallback"].format(mode=mode_text,lines=fallback_lines,more_line=more_line))
 
@@ -1591,14 +1683,15 @@ class VUsernameMod(loader.Module):
         try:await call.answer(plain_emoji(self.strings["find_stopping"]),show_alert=False)
         except Exception as e:logger.debug("Failed to confirm the search stop: %s",e)
 
-    def _build_find_page(self,usernames,page,mode_text):
+    async def _build_find_page(self,usernames,page,mode_text):
         if not usernames:
             return self.strings["find_page_empty"],[[{"text":self.strings["close_button"],"callback":self._close_cb}]]
         pages=max(1,(len(usernames)+self.RESULTS_PER_PAGE-1)//self.RESULTS_PER_PAGE)
         page=max(0,min(page,pages-1))
         start=page*self.RESULTS_PER_PAGE
         page_items=usernames[start:start+self.RESULTS_PER_PAGE]
-        lines="\n".join(f"• <code>@{html.escape(username)}</code>"for username in page_items)
+        price_hints=await self._fetch_price_hints(page_items)
+        lines="\n".join(f"• <code>@{html.escape(username)}</code>{price_hints.get(username,'')}"for username in page_items)
         buttons=[[{"text":f"@{username}","callback":self._grab_cb,"args":(username,)}]for username in page_items]
         if pages>1:
             nav=[]
@@ -1617,7 +1710,7 @@ class VUsernameMod(loader.Module):
             try:await call.edit(text=plain_emoji(self.strings["find_page_empty"]),reply_markup=[[{"text":self.strings["close_button"],"callback":self._close_cb}]])
             except Exception:logger.exception("Failed to show the empty results page")
             return
-        text,buttons=self._build_find_page(tuple(usernames),int(page),mode_text)
+        text,buttons=await self._build_find_page(tuple(usernames),int(page),mode_text)
         try:await call.edit(text=plain_emoji(text),reply_markup=buttons)
         except Exception:logger.exception("Failed to switch the results page")
 
